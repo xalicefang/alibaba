@@ -1,0 +1,32 @@
+{
+  "name": "Tab logger",
+  "version": "1.0.2",
+  "description": "Logs tab behavior",
+  "icons": {
+  },
+  "background": {
+    "persistent": true,
+     //"scripts": ["browserTabs.js"]
+    //"scripts": ["loadingTime.js"]
+    "scripts": ["3party/jquery-1.11.1.js","bgMsgReceiver.js","log/browserTabs.js","log/numberTabs.js","log/loadingTime.js","exp/expBg.js"]
+  },
+  "browser_action": {
+    "default_icon": "tao.png",
+    "default_title": "Tab logger"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*","https://*/*"],
+      //"matches": ["*://*.taobao.com/*","*://stanford.edu/~fangx/cgi-bin/alibaba/*"], 
+      "js":["3party/jquery-1.11.1.js","contentScript.js","exp/expCS.js"],
+      "css": ["exp/expStyle.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "webNavigation"
+  ],
+
+  "manifest_version": 2
+}
