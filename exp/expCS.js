@@ -61,18 +61,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	$(f).submit(function(){
 	   var formData = $(this).serialize();
 
-	    $.ajax({
-	        url: window.localStorage.getItem('submitUrl'),
-	        type: 'POST',
-	        data: formData,
-	        async: false,
-	        success: function (data) {
-	            alert(data)
-	        },
-	        cache: false,
-	        contentType: false,
-	        processData: false
-	    });
+		$.post(window.localStorage.getItem('submitUrl'), formData, function(response) {});
 
 
 		// call save csv files, open new window for new task

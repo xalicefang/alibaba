@@ -98,15 +98,21 @@ function makeRow() {
 }
 
 function downloadCSV () {
-   $.ajax({
-    type: "POST",
-    url: "http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php",
-    data: { csv: csvString, filename: 'browser.csv' },
-    cache: false,
-    // success: function(data){
-    //     alert(data);
-    // }
-  });
+  //  $.ajax({
+  //   type: "POST",
+  //   url: "http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php",
+  //   data: { csv: csvString, filename: 'browser.csv' },
+  //   cache: false,
+  //   // success: function(data){
+  //   //     alert(data);
+  //   // }
+  // });
+
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvString, filename: 'browser.csv' }, function(response) {
+        // log the response to the console
+        console.log("Response: "+response);
+    });
+
 
   // var a = document.createElement('a');
   // a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);

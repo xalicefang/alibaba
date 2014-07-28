@@ -5,21 +5,16 @@
 
 $("form#data").submit(function(){
     var formData = $(this).serialize();
+    console.log(formData);
 
-    $.ajax({
-        url: 'http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php',
-        type: 'POST',
-        data: formData,
-        async: false,
-        success: function (data) {
-            alert(data)
-        },
-        cache: false,
-        contentType: false,
-        processData: false
-    });
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {});
 
 	chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
+
+    var a = document.createElement('a');
+    a.href     = "http://www.taobao.com/?task=1";
+    a.target   = '_self';
+    a.click();
 
     return false;
 });
