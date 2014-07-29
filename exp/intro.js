@@ -7,12 +7,31 @@ $("form#data").submit(function(){
     var formData = $(this).serialize();
     console.log(formData);
 
+    // $.ajax({
+    //     url: "http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php",
+    //     type: "post",
+    //     data: formData,
+    //     success: function (data) {
+    //         alert(data)
+    //     }
+    // });
+
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
-        // log the response to the console
-        alert("Response: "+response);
+        var id = Math.ceil(response/2);
+        if (id%3==1) {
+            window.localStorage.setItem('condition','1');
+        } else if (id%3==2) {
+            window.localStorage.setItem('condition','2');
+        } else {
+            window.localStorage.setItem('condition','3');
+        }
+
+        window.localStorage.setItem('userID', response);
+
     });
 
-	chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
+    //alert("intro " + window.localStorage.getItem('userID'));
+    chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
 
     var a = document.createElement('a');
     a.href     = "http://www.taobao.com/?task=1";

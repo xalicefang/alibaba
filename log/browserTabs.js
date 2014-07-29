@@ -107,10 +107,11 @@ function downloadCSV () {
   //   //     alert(data);
   //   // }
   // });
+    var name = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'browser.csv';
 
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvString, filename: 'browser.csv' }, function(response) {
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvString, filename: name }, function(response) {
         // log the response to the console
-        console.log("Response: "+response);
+        // console.log("Response: "+response);
     });
 
 

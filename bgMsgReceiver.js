@@ -47,12 +47,15 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    }
 
 		downloadCSV();
+	} else if (request.user) {
+		//alert("bg " + window.localStorage.getItem('userID'));
+	    sendResponse({user: window.localStorage.getItem('userID')});
 	}
 });
 
 function removeOtherWin(windows) {
 	chrome.windows.getLastFocused(function(topWin) {
-		alert("Closing all other windows and tabs.");
+		alert("Submitted! Now closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {
 				//chrome.windows.remove(windows[i].id);

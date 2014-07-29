@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(
   	} else if (request.browserAction == "clicked") {
       console.log("clicked!");
       modal.style.visibility = "visible";
-    }
+    } 
   });
 
 document.addEventListener("DOMContentLoaded", function(event) {
