@@ -98,27 +98,11 @@ function makeRow() {
 }
 
 function downloadCSV () {
-  //  $.ajax({
-  //   type: "POST",
-  //   url: "http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php",
-  //   data: { csv: csvString, filename: 'browser.csv' },
-  //   cache: false,
-  //   // success: function(data){
-  //   //     alert(data);
-  //   // }
-  // });
     var name = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'browser.csv';
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvString, filename: name }, function(response) {
-        // log the response to the console
-        // console.log("Response: "+response);
+        console.log(response);
     });
-
-
-  // var a = document.createElement('a');
-  // a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-  // a.target   = '_blank';
-  // a.click();
 }
 
 function clear() {

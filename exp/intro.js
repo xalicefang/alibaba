@@ -17,6 +17,8 @@ $("form#data").submit(function(){
     // });
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
+        alert(response);
+        
         var id = Math.ceil(response/2);
         if (id%3==1) {
             window.localStorage.setItem('condition','1');

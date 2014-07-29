@@ -47,6 +47,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    }
 
 		downloadCSV();
+		downloadCSVLoading();
+		downloadCSVNumber();
 	} else if (request.user) {
 		//alert("bg " + window.localStorage.getItem('userID'));
 	    sendResponse({user: window.localStorage.getItem('userID')});

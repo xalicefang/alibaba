@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		window.localStorage.setItem('taskMsg', 'Task 2.');
 	}
 
-	alert("cs " + window.localStorage.getItem('userID'));
+	//alert("cs " + window.localStorage.getItem('userID'));
 
 	modal = document.createElement('div');
 	modal.innerHTML = window.localStorage.getItem('taskMsg');

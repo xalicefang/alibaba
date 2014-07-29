@@ -21,10 +21,11 @@ function makeRowNumber() {
 }
 
 function downloadCSVNumber () {
-  var a = document.createElement('a');
-  a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvStringNumber);
-  a.target   = '_blank';
-  a.click();
+    var name = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'number.csv';
+
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsvNumber.php', { csv: csvStringNumber, filename: name }, function(response) {
+        console.log(response);
+    });
 }
 
 function clearNumber() {
