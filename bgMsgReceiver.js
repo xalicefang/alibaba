@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 });
 
 function removeOtherWin(windows) {
-	chrome.windows.getLastFocused(function() {
+	chrome.windows.getLastFocused(function(topWin) {
 		alert("Closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {

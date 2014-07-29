@@ -7,7 +7,10 @@ $("form#data").submit(function(){
     var formData = $(this).serialize();
     console.log(formData);
 
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {});
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
+        // log the response to the console
+        alert("Response: "+response);
+    });
 
 	chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
 
