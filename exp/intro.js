@@ -3,6 +3,7 @@
 // 	chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
 // };
 
+
 $("form#data").submit(function(){
     var formData = $(this).serialize();
     console.log(formData);
@@ -19,11 +20,11 @@ $("form#data").submit(function(){
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
         var id = Math.ceil(response/2);
         if (id%3==1) {
-            window.localStorage.setItem('condition','1');
+            window.localStorage.setItem('condition',1);
         } else if (id%3==2) {
-            window.localStorage.setItem('condition','2');
+            window.localStorage.setItem('condition',2);
         } else {
-            window.localStorage.setItem('condition','3');
+            window.localStorage.setItem('condition',3);
         }
 
         window.localStorage.setItem('userID', response);
