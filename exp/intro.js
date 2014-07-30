@@ -17,8 +17,6 @@ $("form#data").submit(function(){
     // });
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
-        alert(response);
-        
         var id = Math.ceil(response/2);
         if (id%3==1) {
             window.localStorage.setItem('condition','1');
@@ -29,16 +27,16 @@ $("form#data").submit(function(){
         }
 
         window.localStorage.setItem('userID', response);
+        //alert("intro " + window.localStorage.getItem('userID'));
+
+        chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
+
+        var a = document.createElement('a');
+        a.href     = "http://www.taobao.com/?task=1";
+        a.target   = '_self';
+        a.click();
 
     });
-
-    //alert("intro " + window.localStorage.getItem('userID'));
-    chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
-
-    var a = document.createElement('a');
-    a.href     = "http://www.taobao.com/?task=1";
-    a.target   = '_self';
-    a.click();
 
     return false;
 });

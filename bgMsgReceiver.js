@@ -50,7 +50,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		downloadCSVLoading();
 		downloadCSVNumber();
 	} else if (request.user) {
-		//alert("bg " + window.localStorage.getItem('userID'));
+		// alert("bg " + window.localStorage.getItem('userID'));
 	    sendResponse({user: window.localStorage.getItem('userID')});
 	}
 });

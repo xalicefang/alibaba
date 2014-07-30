@@ -1,29 +1,11 @@
 function getURLParameter(name) {
-    return decodeURI(
-        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-    );
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
 // on finish, self uninstall!
 // chrome.management.uninstallSelf({showConfirmDialog: false}, callback);
 
 document.addEventListener("DOMContentLoaded", function(event) {
-	if (getURLParameter('task') == 1) {
-		chrome.runtime.sendMessage({user: true}, function(response) {
-			//alert("response " + response.user);
-			window.localStorage.setItem('userID', response.user);
-		});
-		window.localStorage.setItem('task', 1);
-		window.localStorage.setItem('submitUrl', 'http://stanford.edu/~fangx/cgi-bin/alibaba/task1submit.php');
-		window.localStorage.setItem('taskMsg', 'Welcome! For your first task, imagine you are shopping for a new vacuum cleaner.');
-	} else if (getURLParameter('task') == 2) {
-		window.localStorage.setItem('task', 2);
-		window.localStorage.setItem('submitUrl', 'http://stanford.edu/~fangx/cgi-bin/alibaba/task2submit.php');
-		window.localStorage.setItem('taskMsg', 'Task 2.');
-	}
-
-	//alert("cs " + window.localStorage.getItem('userID'));
-
 	modal = document.createElement('div');
 	modal.innerHTML = window.localStorage.getItem('taskMsg');
 	modal.className = "modal"; 
@@ -37,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	i.setAttribute('type',"text");
 	i.setAttribute('name',"userid");
 	i.style.visibility = "hidden";
-	i.setAttribute('value', window.localStorage.getItem('userID'));
 
 	var i2 = document.createElement("input"); //input element, text
 	i2.setAttribute('type',"text");
@@ -57,10 +38,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	closeButton.innerHTML = "Close"
 	modal.appendChild(closeButton);
 
-	console.log(getURLParameter('task'));
-	if (getURLParameter('task')==1 || getURLParameter('task')==2) {
-		console.log("make visible!");
+	if (getURLParameter('task')!= null) {
 		modal.style.visibility = "visible";
+		window.localStorage.setItem('task', getURLParameter('task'));
+		if (getURLParameter('task') == 1) {
+			chrome.runtime.sendMessage({user: true}, function(response) {
+				//alert("response " + response.user);
+				window.localStorage.setItem('userID', response.user);
+				i.setAttribute('value', window.localStorage.getItem('userID'));
+			});
+			window.localStorage.setItem('taskMsg', 'Welcome! For your first task, imagine you are shopping for a new vacuum cleaner.');
+		} else if (getURLParameter('task') == 2) {
+			window.localStorage.setItem('taskMsg', 'Task 2.');
+		}
 	}
 
 	closeButton.onclick = function() {
@@ -82,8 +72,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		//     }
 		// });
 
-		$.post(window.localStorage.getItem('submitUrl'), formData, function(response) {
-			alert(response);
+		$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
+			//alert(response);
 		});
 
 		// call save csv files, open new window for new task

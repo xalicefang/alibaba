@@ -20,10 +20,10 @@ function makeRowNumber() {
   csvStringNumber += csvRow;
 }
 
-function downloadCSVNumber () {
+function downloadCSVNumber() {
     var name = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'number.csv';
 
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsvNumber.php', { csv: csvStringNumber, filename: name }, function(response) {
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringNumber, filename: name }, function(response) {
         console.log(response);
     });
 }
