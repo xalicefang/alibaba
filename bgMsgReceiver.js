@@ -32,25 +32,35 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// if click back/ forward/ refresh/ address bar change
     else if (request.unload) {
     	startTime = Date.now();
-    	// write to csv here too!!!!!!
+    	chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
+	      var tab = tabs[0];
+	      makeRow("unload",tab.id,tab.index,tab.windowId,tab.url);
+	    });
 	}
 
 	// experimental actions
 	else if (request.finishedTask) {
-		console.log("finished " + request.finishedTask);
-	    if (request.finishedTask == 1) {
-	    	chrome.windows.create({url: 'http://www.taobao.com/?task=2'});
+		makeRow("finished task " + request.finishedTask);
+
+		// add progress points!! halfway there!
+		
+		// check if time reached
+		var currSec = new Date().getTime() / 1000;
+		if (currSec > window.localStorage.getItem('stopTime')) {
+			chrome.windows.create({url: '/exp/finished.html'});
 	    	chrome.windows.getAll(null, removeOtherWin);
-	    } else if (request.finishedTask == 2) {
-	    	chrome.windows.create({url: 'http://www.taobao.com/?task=3'});
-	    	chrome.windows.getAll(null, removeOtherWin);
-	    }
+	    } else {
+		   	var nextURL = "http://www.taobao.com/?task=" + ++request.finishedTask;
+			console.log("next " + nextURL);
+		    chrome.windows.create({url: nextURL});
+		    chrome.windows.getAll(null, removeOtherWin);
+		}
 
 		downloadCSV();
 		downloadCSVLoading();
 		downloadCSVNumber();
 	} else if (request.user) {
-		// alert("bg " + window.localStorage.getItem('userID'));
+		//alert("bg " + window.localStorage.getItem('userID'));
 	    sendResponse({user: window.localStorage.getItem('userID')});
 	}
 });

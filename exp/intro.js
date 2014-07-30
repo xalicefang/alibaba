@@ -32,11 +32,16 @@ $("form#data").submit(function(){
 
         chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
 
+        // set timer
+        var seconds = new Date().getTime() / 1000;
+        var totalTime = 720;
+        //var totalTime = 15;
+        window.localStorage.setItem('stopTime',seconds+totalTime); 
+
         var a = document.createElement('a');
         a.href     = "http://www.taobao.com/?task=1";
         a.target   = '_self';
         a.click();
-
     });
 
     return false;
