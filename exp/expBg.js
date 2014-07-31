@@ -5,7 +5,7 @@ chrome.windows.create({
 function openModal() {
 	console.log("clicked!");
 	// match URL!!!!
-	chrome.tabs.query({active: true, currentWindow: true, url: "http://*/*"}, function(tabs) {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		if (tabs.length==1) {
 			var tab = tabs[0];
 			console.log(tab.id);

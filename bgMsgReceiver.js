@@ -4,10 +4,10 @@
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// click link, open in same tab (new tab covered by onActivated)
 	if (request.link) {
-		// be sure to match url with permissions!!!!!!!!!
-    	  chrome.tabs.query({active: true, currentWindow: true, url: "http://*/*"}, function(tabs) {
+	  // be sure to match url with permissions!!!!!!!!!
+	  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         var tab = tabs[0];
-        // open new tab in background will trigger this too! for loading time it doesn't matter. but for logging it does.
+        // i don't think i need the if anymore. remove???!!
         if (tab.id==sender.tab.id) {
           clickedLink(request.link);
         }
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     } 
     // if active tab dom loaded
     else if (request.domLoaded) {
-	  chrome.tabs.query({active: true, currentWindow: true, url: "http://*/*"}, function(tabs) {
+	  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	  	if (tabs.length>0) {
 		 	var tab = tabs[0];
 	 		if (tab.id==sender.tab.id) {
@@ -41,9 +41,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// experimental actions
 	else if (request.finishedTask) {
 		makeRow("finished task " + request.finishedTask);
+		// set task for background pages, so csv saving can access
+		window.localStorage.setItem('task',request.finishedTask);
 
 		// add progress points!! halfway there!
-		
+
 		// check if time reached
 		var currSec = new Date().getTime() / 1000;
 		if (currSec > window.localStorage.getItem('stopTime')) {

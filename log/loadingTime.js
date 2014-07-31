@@ -5,7 +5,7 @@ chrome.tabs.onActivated.addListener(checkLoading);
 
 function checkLoading() {
 	// match with manifest permission
-	chrome.tabs.query({active: true, currentWindow: true, url: "http://*/*"}, function(tabs) {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		if (tabs.length==1) {
 			var tab = tabs[0];
 

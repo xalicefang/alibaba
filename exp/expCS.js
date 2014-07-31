@@ -6,6 +6,28 @@ function getURLParameter(name) {
 // chrome.management.uninstallSelf({showConfirmDialog: false}, callback);
 
 document.addEventListener("DOMContentLoaded", function(event) {
+	// if first time entering into task
+	if (getURLParameter('task')!= null) {
+		window.localStorage.setItem('task', getURLParameter('task'));
+		if (getURLParameter('task') == 1) {
+			window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
+		} else if (getURLParameter('task') == 2) {
+			window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
+		} else if (getURLParameter('task') == 3) {
+			window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
+		} else if (getURLParameter('task') == 4) {
+			window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
+		} else if (getURLParameter('task') == 5) {
+			window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
+		} else if (getURLParameter('task') == 6) {
+			window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
+		} else if (getURLParameter('task') == 7) {
+			window.localStorage.setItem('taskMsg', 'Task 7.');
+		} else if (getURLParameter('task') == 8) {
+			window.localStorage.setItem('taskMsg', 'Task 8.');
+		}
+	}
+
 	var modal = document.createElement('div');
 	modal.innerHTML = window.localStorage.getItem('taskMsg');
 	modal.className = "modal"; 
@@ -41,27 +63,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	closeButton.innerHTML = "Close";
 	modal.appendChild(closeButton);
 
-	// if first time entering into task
 	if (getURLParameter('task')!= null) {
 		modal.style.visibility = "visible";
-		window.localStorage.setItem('task', getURLParameter('task'));
-		if (getURLParameter('task') == 1) {
-			window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
-		} else if (getURLParameter('task') == 2) {
-			window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
-		} else if (getURLParameter('task') == 3) {
-			window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
-		} else if (getURLParameter('task') == 4) {
-			window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
-		} else if (getURLParameter('task') == 5) {
-			window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
-		} else if (getURLParameter('task') == 6) {
-			window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
-		} else if (getURLParameter('task') == 7) {
-			window.localStorage.setItem('taskMsg', 'Task 7.');
-		} else if (getURLParameter('task') == 8) {
-			window.localStorage.setItem('taskMsg', 'Task 8.');
-		}
 	}
 
 	closeButton.onclick = function() {
@@ -89,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			var r = confirm("Please take your time, and browse as you normally would! The experiment will take the same amount of time no matter your speed of completion. Are you sure you want to submit?");
 			if (r == true) {
 			    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
-					alert(response);
+					//alert(response);
 				});
 		        window.localStorage.setItem('lastTime', currTime); 
 		        // call save csv files, open new window for new task
@@ -97,9 +100,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			} 
 		} else {
 			$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
-				alert(response);
+				//alert(response);
 			});
-			// save time of submit; store this to csv?!!!!!
+			// save time of submit
 			window.localStorage.setItem('lastTime', currTime); 
 
 			// call save csv files, open new window for new task

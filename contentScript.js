@@ -1,8 +1,9 @@
-// if first time, set user id for content pages
-if (window.localStorage.getItem('userID')==null) {
+// for some reason, some pages have weird userID's, so set every page.
+//if (window.localStorage.getItem('userID')==null) {
   chrome.runtime.sendMessage({user: true}, function(response) {
     //alert("response " + response.user);
     window.localStorage.setItem('userID', response.user);
+    
     
     // get condition
     var id = Math.ceil(response.user/2);
@@ -19,7 +20,7 @@ if (window.localStorage.getItem('userID')==null) {
     }
 
   });
-}
+//}
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -49,10 +50,13 @@ function nodeInsertedCallback(event) {
     // there's repeats with related node, but it covers everything
     var a = event.relatedNode.getElementsByTagName('a');
     for (i=0;i<a.length;i++) { 
+      console.log(a[i]);
         a[i].onclick = function() {
           // if not new tab
-          if (history.length > 1)
+          if (history.length > 1) {
+            //alert(a[i].href);
             chrome.runtime.sendMessage({link: a[i].href});
+          }
         };
     }
 }
