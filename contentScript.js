@@ -7,14 +7,14 @@
     
     // get condition
     var id = Math.ceil(response.user/2);
-    if (id%3==1) {
+    if (id%2==1) {
         console.log('same tab!');
         document.addEventListener('DOMNodeInserted', sameTab);
         window.localStorage.setItem('condition',1);
-    } else if (id%3==2) {
-        window.localStorage.setItem('condition',2);
-        console.log('background tab!');
-        document.addEventListener('DOMNodeInserted', backgroundTab);
+    // } else if (id%3==2) {
+    //     window.localStorage.setItem('condition',2);
+    //     console.log('background tab!');
+    //     document.addEventListener('DOMNodeInserted', backgroundTab);
     } else {
         window.localStorage.setItem('condition',3);
     }
@@ -107,7 +107,7 @@ document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 if (window.localStorage.getItem('condition')==1) {
   console.log('same tab!');
   document.addEventListener('DOMNodeInserted', sameTab);
-} else if (window.localStorage.getItem('condition')==2) {
-  console.log('background tab!');
-  document.addEventListener('DOMNodeInserted', backgroundTab);
+// } else if (window.localStorage.getItem('condition')==2) {
+//   console.log('background tab!');
+//   document.addEventListener('DOMNodeInserted', backgroundTab);
 } 

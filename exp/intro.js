@@ -19,10 +19,10 @@ $("form#data").submit(function(){
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(response) {
         var id = Math.ceil(response/2);
-        if (id%3==1) {
+        if (id%2==1) {
             window.localStorage.setItem('condition',1);
-        } else if (id%3==2) {
-            window.localStorage.setItem('condition',2);
+        // } else if (id%3==2) {
+        //     window.localStorage.setItem('condition',2);
         } else {
             window.localStorage.setItem('condition',3);
         }
