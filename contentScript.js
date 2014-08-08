@@ -1,23 +1,10 @@
-// for some reason, some pages have weird userID's, so set every page.
+// for some reason, some pages have weird userID's, so set every page. - local storage doesn't persist between domains!
 //if (window.localStorage.getItem('userID')==null) {
   chrome.runtime.sendMessage({user: true}, function(response) {
     //alert("response " + response.user);
+    console.log(response);
     window.localStorage.setItem('userID', response.user);
-    
-    
-    // get condition
-    var id = Math.ceil(response.user/2);
-    if (id%2==1) {
-        console.log('same tab!');
-        document.addEventListener('DOMNodeInserted', sameTab);
-        window.localStorage.setItem('condition',1);
-    // } else if (id%3==2) {
-    //     window.localStorage.setItem('condition',2);
-    //     console.log('background tab!');
-    //     document.addEventListener('DOMNodeInserted', backgroundTab);
-    } else {
-        window.localStorage.setItem('condition',3);
-    }
+    window.localStorage.setItem('condition', response.condition);
 
   });
 //}
@@ -30,11 +17,24 @@ chrome.runtime.onMessage.addListener(
     if (request.get == "readyState") {
       //console.log(document.readyState);
       sendResponse({readyState: document.readyState});
-  	} else if (request.browserAction == "clicked") {
+
+  	} 
+
+    else if (request.browserAction == "clicked") {
       console.log("clicked!");
       var modal = document.getElementById('modal');
       modal.style.visibility = "visible";
     } 
+
+    else if (request.newActivate) {
+      console.log("start watch!");
+      startActiveWatch();
+    }
+
+    else if (request.oldDeactivate) {
+      stopActiveWatch();
+    }
+
   });
 
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -50,7 +50,6 @@ function nodeInsertedCallback(event) {
     // there's repeats with related node, but it covers everything
     var a = event.relatedNode.getElementsByTagName('a');
     for (i=0;i<a.length;i++) { 
-      console.log(a[i]);
         a[i].onclick = function() {
           // if not new tab
           if (history.length > 1) {
@@ -78,36 +77,28 @@ function sameTab(event) {
   }
 }
 
-function backgroundTab(event) {
-    // there's repeats with related node, but it covers everything
-    var a = event.relatedNode.getElementsByTagName('a');
-    for (i=0;i<a.length;i++) { 
-        a[i].target="_blank";
-        a[i].onclick=function(){
-          // prevent original link behavior
-          a.preventDefault;
-          var b = document.createElement('a');
-          // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
-          b.href = a.href;
-          var evt = document.createEvent("MouseEvents");    
-          evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, false, 0, null);
-          b.dispatchEvent(evt);
-        };
-    } 
-
-    var b = event.relatedNode.getElementsByTagName('base'); 
-    for (i=0;i<b.length;i++) { 
-      b[i].parentNode.removeChild(b[i]);          
+function backgroundTab() {
+  // unbind previous links (to prevent repeats), needed because user click links while nodes added
+  $( "a" ).unbind();
+  $( "a" ).click(function(e) {
+    e.preventDefault();
+    var a = $(this)[0].href;
+    // exclude the expand/ min link
+    if (a.indexOf('#', a.length - 1) === -1) {
+      var b = document.createElement('a');
+      // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+      b.href = a;
+      var evt = document.createEvent("MouseEvents");    
+      evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, false, 0, null);
+      b.dispatchEvent(evt);
     }
-
+  });
 }
 
 document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
 if (window.localStorage.getItem('condition')==1) {
-  console.log('same tab!');
   document.addEventListener('DOMNodeInserted', sameTab);
-// } else if (window.localStorage.getItem('condition')==2) {
-//   console.log('background tab!');
-//   document.addEventListener('DOMNodeInserted', backgroundTab);
+} else if (window.localStorage.getItem('condition')==2) {
+  document.addEventListener('DOMNodeInserted', backgroundTab);
 } 

@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     // if active tab dom loaded
     else if (request.domLoaded) {
 	  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  	if (tabs.length>0) {
+	  	if (tabs.length > 0) {
 		 	var tab = tabs[0];
 	 		if (tab.id==sender.tab.id) {
 	 			var loadingTime = Date.now() - startTime;
@@ -38,11 +38,19 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    });
 	}
 
+	// store task on start and task message
+	else if (request.task) {
+		window.localStorage.setItem('task',request.task);
+	}
+
+	// get task
+	else if (request.getTask) {
+	    sendResponse({task: window.localStorage.getItem('task')});
+	}
+
 	// experimental actions
 	else if (request.finishedTask) {
 		makeRow("finished task " + request.finishedTask);
-		// set task for background pages, so csv saving can access
-		window.localStorage.setItem('task',request.finishedTask);
 
 		// add progress points!! halfway there!
 
@@ -61,9 +69,28 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		downloadCSV();
 		downloadCSVLoading();
 		downloadCSVNumber();
-	} else if (request.user) {
+	} 
+
+	// send userID to content page
+	else if (request.user) {
 		//alert("bg " + window.localStorage.getItem('userID'));
-	    sendResponse({user: window.localStorage.getItem('userID')});
+	    sendResponse({user: window.localStorage.getItem('userID'), condition: window.localStorage.getItem('condition')});
+	} 
+
+	// ??: do we need to use local storage if just in background page?
+	// stop timer when inactive request
+	else if (request.stopTimer) {
+		// how much time left till stop
+		var currSec = new Date().getTime() / 1000;
+		window.localStorage.setItem(timeLeft, window.localStorage.getItem('stopTime') - currSec);
+	} 
+
+	// start timer when active request
+	else if (request.startTimer) {
+		// reset stop time
+		var currSec = new Date().getTime() / 1000;
+		var stopTime = currSec + window.localStorage.getItem(timeLeft);
+		window.localStorage.setItem('stopTime', stopTime);
 	}
 });
 
@@ -72,6 +99,7 @@ function removeOtherWin(windows) {
 		alert("Submitted! Now closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {
+				//!!!!!!!!
 				//chrome.windows.remove(windows[i].id);
 			}
 		}

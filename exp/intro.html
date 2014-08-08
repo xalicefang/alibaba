@@ -1,22 +1,37 @@
 <head>
 <script src="/3party/jquery-1.11.1.js"></script>
+<link rel="stylesheet" type="text/css" href="expStyle.css" />
 </head>
 
-<h1>Study information</h1>
+<body>
 
-<p>Thank you for participating in this study. Upon clicking "start," you will be given a series of tasks to complete on Taobao, until 15 minutes is reached. The study will last for approximately 15 minutes regardless of task completion speed. Please perform the tasks as closely as you would in real life. On completion of the study, this extension will be automatically uninstalled and you will receive a ￥10 Taobao gift certificate in the mailbox of the email you have provided.</p>
+<div class="header">
+	<div class='logoBox'><img class='logo' src="/uedlogo.png"></div>
+</div>
 
-<p>Please note that all currently open Chrome browser windows will close when the study begins.</p>
+<div class="body expText">
+	<h2>Taobao Web Search Study</h2>
+	<p>Upon clicking "start," you will be given a series of tasks to complete on Taobao, until 15 minutes is reached. The study will last for approximately 15 minutes regardless of task completion speed. Please perform the tasks as closely as you would in real life. On completion of the study, this extension will be automatically uninstalled and you will receive a &#165;10 Taobao gift certificate in the mailbox of the email you have provided.</p>
 
-<form id="data">
-	<label>Name</label>
-    <input type="text" name="name"/></br>
-    <label>Email</label>
-    <input type="text" name="email"/></br>
-    <button>Start</button>
-</form>
+	<p>Please note that all currently open Chrome browser windows will close when the study begins.</p>
+
+	<div class="terms">
+		<b>Terms and conditions</b>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	</div>
+
+	<form id="intro">
+		<input class="input" type="checkbox" name="terms" id="terms" value="agree">I accept these full terms and conditions.</input></br>
+		<label>Name: </label>
+	    <input class="input" type="text" name="name" size="40"/></br>
+	    <label>Email: </label>
+	    <input class="input" type="text" name="email" size="40"/></br>
+	    <button>Confirm</button>
+	</form>
+</div>
 
 <!-- use url parameters to trigger modal? in content script add modal. --> 
 <!--a id="startExperiment" href="http://www.taobao.com/?task=1">Start</a-->
 
 <script src="intro.js"></script>
+</body>

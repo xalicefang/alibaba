@@ -18,6 +18,10 @@ chrome.windows.onRemoved.addListener(removedWindow);
 chrome.windows.onFocusChanged.addListener(windowFocus);
 chrome.webNavigation.onCommitted.addListener(backButton);
 
+// if create new tab or activate different tab, call change active tab to start activity timer
+// chrome.tabs.onCreated.addListener(updateActivityMonitor);
+// chrome.tabs.onActivated.addListener(updateActivityMonitor);
+
 // chrome.tabs.onDetached.addListener(detached);
 // chrome.tabs.onAttached.addListener(attached);
 // chrome.tabs.onHighlighted.addListener(highlighted);
@@ -26,7 +30,6 @@ chrome.webNavigation.onCommitted.addListener(backButton);
 // also loads for newly created tabs - duplicated.
 // ignore for now. use some on click function or webNav to store within tab navigation and  back button stuff. 
 //chrome.tabs.onUpdated.addListener(updated); 
-
 
 
 function newTab(tab) {
@@ -87,6 +90,23 @@ function backButton(details) {
 // function highlighted(highlightInfo) {
 //   makeRow("highlighted",highlightInfo.windowId,highlightInfo.tabIds); 
 // }
+
+// on active tab changed (new tab, activated), activate timer of active tab and deactivate timer of last tab
+oldActive = null;
+function updateActivityMonitor() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    if (tabs.length==1) {
+    var tab = tabs[0];
+    console.log("new: " + tab.id);
+      chrome.tabs.sendMessage(tab.id, {newActivate: true});
+      if (oldActive) {
+        console.log("old: " + oldActive.id);
+        chrome.tabs.sendMessage(oldActive.id, {oldDeactivate:true})
+      }
+      oldActive = tab;
+    }
+  }); 
+}
 
 function makeRow() {
   var csvRow = Date.now();
