@@ -1,18 +1,17 @@
 {
   "manifest_version": 2,
-  "name": "Tab logger",
-  "version": "1.0.2",
-  "description": "Logs tab behavior",
+  "name": "Taobao search study",
+  "version": "1.0.3",
+  "description": "Alibaba User Experience Design research study on Taobao search.",
   "background": {
     "persistent": true,
     "scripts": ["3party/jquery-1.11.1.js","exp/intro.js","bgMsgReceiver.js","log/browserTabs.js","log/numberTabs.js","log/loadingTime.js","exp/expBg.js"]
   },
   "browser_action": {
-    "default_title": "Taobao Web Search Study"
+    "default_title": "Taobao Search Study"
   },
   "content_scripts": [
     {
-      //"matches": ["http://*/*","https://*/*"],
       "matches": ["*://*.taobao.com/*","*://stanford.edu/~fangx/cgi-bin/alibaba/*","*://alicefang.com/*"], 
       "js":["3party/jquery-1.11.1.js","contentScript.js","exp/expCS.js","exp/inactive.js"],
       "css": ["exp/expStyle.css"],

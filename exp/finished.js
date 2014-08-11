@@ -5,6 +5,4 @@ console.log(finishData);
 $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/finish.php', finishData, function(r) {
 });
 
-$("button").click(function(){
-	chrome.management.uninstallSelf({showConfirmDialog: true});
-});
+chrome.management.uninstallSelf({showConfirmDialog: true});

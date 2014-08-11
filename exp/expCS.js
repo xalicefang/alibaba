@@ -1,9 +1,12 @@
-if (window.localStorage.getItem('finished')) {
-	alert("Sorry, you have already completed this experiment.");
-	var a = document.createElement('a');
-	a.href     = "/exp/finished.html";
-	a.target   = '_self';
-	a.click();
+if (document.URL.indexOf("exp/finished.html") == -1 && window.localStorage.getItem('finished')) {
+	alert("You have already completed this experiment!");
+	chrome.runtime.sendMessage({sendToFinish:true});
+}
+
+if (!window.localStorage.getItem('started')) {
+	window.localStorage.setItem('started',true);
+	var firstTime = {stopTime: window.localStorage.getItem('startTime'), userID: window.localStorage.getItem('userID'), condition: window.localStorage.getItem('condition')};
+	chrome.runtime.sendMessage({started:firstTime});
 }
 
 function getURLParameter(name) {

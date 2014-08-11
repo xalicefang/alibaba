@@ -1,6 +1,6 @@
 chrome.windows.create({
-    url: '/exp/intro.html'
-  });
+    url: 'exp/intro.html'
+});
 
 function openModal() {
 	console.log("clicked!");
@@ -16,5 +16,3 @@ function openModal() {
 }
 
 chrome.browserAction.onClicked.addListener(openModal);
-
-//chrome.browserAction.onClicked.addListener(function() {console.log("click";)});

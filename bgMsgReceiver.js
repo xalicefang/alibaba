@@ -94,11 +94,23 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		var stopTime = currSec + window.localStorage.getItem(timeLeft);
 		window.localStorage.setItem('stopTime', stopTime);
 	}
+
+	else if (request.started) {
+		console.log(request.started);
+	}
+
+	else if (request.sendToFinish) {
+		chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
+			var tab = tabs[0];
+			chrome.tabs.update(tab.id, {url: "/exp/finished.html"});
+		});
+		
+	}
 });
 
 function removeOtherWin(windows) {
 	chrome.windows.getLastFocused(function(topWin) {
-		alert("Submitted! Now closing all other windows and tabs.");
+		alert("Closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {
 				//!!!!!!!!
