@@ -123,8 +123,6 @@ function downloadCSV () {
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvString, filename: name }, function(response) {
         console.log(response);
     });
-}
-
-function clear() {
-  csvString='';
+    
+    csvString='';
 }

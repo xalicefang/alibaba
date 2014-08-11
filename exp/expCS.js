@@ -1,29 +1,44 @@
+if (window.localStorage.getItem('finished')) {
+	alert("Sorry, you have already completed this experiment.");
+	var a = document.createElement('a');
+	a.href     = "/exp/finished.html";
+	a.target   = '_self';
+	a.click();
+}
+
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
 // if first time entering into task
 if (getURLParameter('task')!= null) {
-	window.localStorage.setItem('task', getURLParameter('task'));
-	if (getURLParameter('task') == 1) {
-		window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
-	} else if (getURLParameter('task') == 2) {
-		window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
-	} else if (getURLParameter('task') == 3) {
-		window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
-	} else if (getURLParameter('task') == 4) {
-		window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
-	} else if (getURLParameter('task') == 5) {
-		window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
-	} else if (getURLParameter('task') == 6) {
-		window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
-	} else if (getURLParameter('task') == 7) {
-		window.localStorage.setItem('taskMsg', 'Task 7.');
-	} else if (getURLParameter('task') == 8) {
-		window.localStorage.setItem('taskMsg', 'Task 8.');
-	}
-	// save task to bg
-	chrome.runtime.sendMessage({task: getURLParameter('task')});
+	// prevent going back or forward!!
+	//if (window.localStorage.getItem('task')==null || window.localStorage.getItem('task') >= getURLParameter('task')) {
+		// probably should set this in background and not use url parameters... 
+		window.localStorage.setItem('task', getURLParameter('task'));
+		if (getURLParameter('task') == 1) {
+			window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
+		} else if (getURLParameter('task') == 2) {
+			window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
+		} else if (getURLParameter('task') == 3) {
+			window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
+		} else if (getURLParameter('task') == 4) {
+			window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
+		} else if (getURLParameter('task') == 5) {
+			window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
+		} else if (getURLParameter('task') == 6) {
+			window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
+		} else if (getURLParameter('task') == 7) {
+			window.localStorage.setItem('taskMsg', 'Task 7.');
+		} else if (getURLParameter('task') == 8) {
+			window.localStorage.setItem('taskMsg', 'Task 8.');
+		}
+		// save task to bg
+		chrome.runtime.sendMessage({task: getURLParameter('task')});
+	// } else {
+	// 	alert("Sorry, you must complete the tasks in order. Please go back to the previous page.");
+	// 	history.back();
+	// }
 } 
 // else get task from bgMsg
 else {
@@ -121,11 +136,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		expand.style.display = "inline";
 	}
 
+	$(shade).click(function() {
+		shade.style.visibility = "hidden";
+    	$(modal).slideUp();
+    	min.style.display = "none";
+    	expand.style.display = "inline";
+    	return false; 
+	});
+
 	$(min).click(function(){
     	shade.style.visibility = "hidden";
     	$(modal).slideUp();
     	min.style.display = "none";
     	expand.style.display = "inline";
+    	return false; 
+    });
+
+	$(header).click(function(){
+		modal.style.visibility = "visible";
+		shade.style.visibility = "visible";
+		$(modal).slideDown();
+    	min.style.display = "inline";
+    	expand.style.display = "none";
     	return false; 
     });
 
@@ -153,19 +185,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		// });
 
 
-		var currTime = new Date().getTime() / 1000;
-		if (window.localStorage.getItem('lastTime') && (window.localStorage.getItem('lastTime') - currTime) < 60) {
-			var r = confirm("Please take your time, and browse as you normally would! The experiment will take the same amount of time no matter your speed of completion. Are you sure you want to submit?");
-			if (r == true) {
-			    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
-					//alert(response);
-				});
-		        window.localStorage.setItem('lastTime', currTime); 
-		        // call save csv files, open new window for new task
-				chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')});
-			} 
-		} else {
-			// check to make sure link field okay!!!
+		function submitTask() {
 			$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
 				//alert(response);
 			});
@@ -173,7 +193,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			window.localStorage.setItem('lastTime', currTime); 
 
 			// call save csv files, open new window for new task
-			chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')});
+			chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')}, function(response) {
+			    console.log(response.finished);	
+			    if (response.finished) {
+			    	window.localStorage.setItem('finished', true);
+			    }   
+			});
+		}
+
+		var currTime = new Date().getTime() / 1000;
+		if (window.localStorage.getItem('lastTime') && (window.localStorage.getItem('lastTime') - currTime) < 60) {
+			var r = confirm("Please take your time, and browse as you normally would! The experiment will take the same amount of time no matter your speed of completion. Are you sure you want to submit?");
+			if (r == true) {
+			   submitTask();
+			} 
+		} else {
+			submitTask();
 		}
 
 	    return false;

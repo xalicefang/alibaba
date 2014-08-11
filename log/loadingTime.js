@@ -36,10 +36,8 @@ function downloadCSVLoading () {
 	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringLoading, filename: name }, function(response) {
 		console.log(response);
 	});
-}
 
-function clearLoading() {
-  csvStringLoading='';
+	csvStringLoading='';
 }
 
 // from click case

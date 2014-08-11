@@ -26,8 +26,6 @@ function downloadCSVNumber() {
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringNumber, filename: name }, function(response) {
         console.log(response);
     });
-}
 
-function clearNumber() {
-  csvStringNumber='';
+    csvStringNumber='';
 }

@@ -57,12 +57,14 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		// check if time reached
 		var currSec = new Date().getTime() / 1000;
 		if (currSec > window.localStorage.getItem('stopTime')) {
+	    	sendResponse({finished: true});
 			chrome.windows.create({url: '/exp/finished.html'});
 	    	chrome.windows.getAll(null, removeOtherWin);
 	    } else {
-		   	var nextURL = "http://www.taobao.com/?task=" + ++request.finishedTask;
-			console.log("next " + nextURL);
-		    chrome.windows.create({url: nextURL});
+	    	sendResponse({finished: false});
+	    	// QUALTRICS!!
+	    	var qualtricsURL = 'https://stanforduniversity.qualtrics.com/SE/?SID=SV_4YqyXNcsWvyB26x&userID='+ window.localStorage.getItem('userID') +'&task='+ request.finishedTask +'&condition=' + window.localStorage.getItem('condition');
+            chrome.windows.create({url: qualtricsURL});
 		    chrome.windows.getAll(null, removeOtherWin);
 		}
 
