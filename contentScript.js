@@ -186,6 +186,7 @@ if (window.localStorage.getItem('task')==1) {
     document.addEventListener('DOMNodeInserted', sameTab);
 }
 if (window.localStorage.getItem('condition')==1) {
+  console.log("condition 1");
   if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==8) {
     console.log("same tab");
     document.addEventListener('DOMNodeInserted', sameTab);
@@ -194,6 +195,7 @@ if (window.localStorage.getItem('condition')==1) {
     document.addEventListener('DOMNodeInserted', backgroundTab);
   } 
 } else if (window.localStorage.getItem('condition')==2) {
+  console.log("condition 2");
   if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')== 6 || window.localStorage.getItem('task')==9) {
     console.log("same tab");
     document.addEventListener('DOMNodeInserted', sameTab);
@@ -202,6 +204,7 @@ if (window.localStorage.getItem('condition')==1) {
     document.addEventListener('DOMNodeInserted', backgroundTab);
   } 
 } else {
+  console.log("condition 3");
   if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')== 7 || window.localStorage.getItem('task')==10) {
     console.log("same tab");
     document.addEventListener('DOMNodeInserted', sameTab);
