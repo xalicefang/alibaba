@@ -9,65 +9,118 @@ if (!window.localStorage.getItem('started')) {
 	chrome.runtime.sendMessage({started:firstTime});
 }
 
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-}
-
-// if first time entering into task
-if (getURLParameter('task')!= null) {
-	// prevent going back or forward!!
-	//if (window.localStorage.getItem('task')==null || window.localStorage.getItem('task') >= getURLParameter('task')) {
-		// probably should set this in background and not use url parameters... 
-		window.localStorage.setItem('task', getURLParameter('task'));
-		if (getURLParameter('task') == 1) {
-			window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
-		} else if (getURLParameter('task') == 2) {
-			window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
-		} else if (getURLParameter('task') == 3) {
-			window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
-		} else if (getURLParameter('task') == 4) {
-			window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
-		} else if (getURLParameter('task') == 5) {
-			window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
-		} else if (getURLParameter('task') == 6) {
-			window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
-		} else if (getURLParameter('task') == 7) {
-			window.localStorage.setItem('taskMsg', 'Task 7.');
-		} else if (getURLParameter('task') == 8) {
-			window.localStorage.setItem('taskMsg', 'Task 8.');
-		}
-		// save task to bg
-		chrome.runtime.sendMessage({task: getURLParameter('task')});
-	// } else {
-	// 	alert("Sorry, you must complete the tasks in order. Please go back to the previous page.");
-	// 	history.back();
-	// }
-} 
-// else get task from bgMsg
-else {
-	chrome.runtime.sendMessage({getTask: true}, function(response) {
-		window.localStorage.setItem('task', response.task);
-		if (response.task == 1) {
-			window.localStorage.setItem('taskMsg', "You're going on a hike next weekend. Look for a pair of Nike tennis shoes you would wear. Please search and browse as you would normally do and paste the URL of your selection in the box below. You may close this box at any time, and open it again by clicking on the orange Taobao icon to the upper right of your browser.");
-		} else if (response.task == 2) {
-			window.localStorage.setItem('taskMsg', 'You are looking for an iPhone 5c.');
-		} else if (response.task == 3) {
-			window.localStorage.setItem('taskMsg', 'It’s getting hot outside. Find a new summer outfit.');
-		} else if (response.task == 4) {
-			window.localStorage.setItem('taskMsg', "Your friend's birthday is next week. Find a present for him/ her.");
-		} else if (response.task == 5) {
-			window.localStorage.setItem('taskMsg', 'Your water kettle is in need of replacement. Please find one here. ');
-		} else if (response.task == 6) {
-			window.localStorage.setItem('taskMsg', 'Your child (or a friend’s child) is getting ready for school and needs to buy new notebooks. Please find an item you would be willing to buy.');
-		} else if (response.task == 7) {
-			window.localStorage.setItem('taskMsg', 'Task 7.');
-		} else if (response.task == 8) {
-			window.localStorage.setItem('taskMsg', 'Task 8.');
-		}
-	});
-}
 
 document.addEventListener("DOMContentLoaded", function(event) {
+	// disable right click context menu
+	document.body.setAttribute("oncontextmenu","return false");
+
+	// clean taobao search listings page
+	if (document.URL.indexOf("s.taobao.com") != -1) {
+		document.body.removeChild($(".tb-side")[0]);
+		document.body.removeChild($(".site-nav")[0]);
+		$("#page")[0].removeChild($(".tb-wrapper")[0]);
+		$("#page")[0].removeChild($(".tb-bottom")[0]);
+		$("#page")[0].removeChild($(".search-panel")[0]);
+		$("#page")[0].removeChild($(".tb-footer")[0]);
+		$(".tb-supplement-tbalink")[0].removeChild($(".tbalink")[0]);
+		$(".tb-wrapper-main")[0].removeChild($(".tb-navi")[0]);
+		$(".tb-wrapper-main")[0].removeChild($(".supplement-relate")[0]);
+		$(".tb-wrapper-main")[0].removeChild($(".tb-sortbar")[0]);
+		$(".tb-wrapper-main")[0].removeChild($(".tb-filter")[0]);
+		$(".tb-container")[0].removeChild($(".tb-wrapper-sub")[0]);
+		$(".tb-container")[0].style.margin = "80px 0";
+
+		//delete stuff from item boxes
+		var allItemBoxes = document.getElementsByClassName("item-box");
+		for (var i = 0; i < allItemBoxes.length; i++) {
+			var item = allItemBoxes[i];
+			var itemChildren = item.childNodes;
+			while(itemChildren[2]) {
+				item.removeChild(itemChildren[2]);
+			}
+		}
+
+		//shorten column length
+		var allItems = document.getElementsByClassName("item");
+		for (var i = 0; i < allItems.length; i++) {
+			var item = allItems[i];
+			item.style.height="233px";
+		}
+
+		var allPics = document.getElementsByClassName("pic");
+		for (var i = 0; i < allPics.length; i++) {
+			var pic = allPics[i];
+			var picChild = allPics[i].childNodes;
+			while(picChild[2]) {
+				pic.removeChild(picChild[2]);
+			}
+		}
+
+	}
+	// clean taobao items page
+	else if(document.URL.indexOf("item.taobao.com") != -1) {
+		var keep = $("#detail")[0];
+		// // don't remove scripts!
+		var child = document.body.firstChild;
+		while (child) {
+			console.log(child);
+			var oldChild = child;
+			child = oldChild.nextSibling;
+			if(oldChild.tagName!='SCRIPT') {
+			    document.body.removeChild(oldChild);
+			}
+		}
+		document.body.appendChild(keep);
+		// var keep2 = $(".tb-detail-bd")[0];
+		// while (keep2.firstChild) {
+		//     keep2.removeChild(keep2.firstChild);
+		// }
+		// keep.appendChild(keep2);
+		$(".tb-detail-bd")[0].removeChild($(".tb-sidebar")[0]);
+		$(".tb-wrap")[0].removeChild($(".tb-key")[0]);
+		$(".tb-wrap")[0].removeChild($(".tb-extra")[0]);
+		$("#J_Social")[0].parentNode.removeChild($("#J_Social")[0]);
+		$(".tb-detail-bd")[0].style.margin = "80px 0 0 0";
+	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
+		// // don't remove scripts!
+		// var child = document.body.firstChild;
+		// while (child) {
+		// 	console.log(child);
+		// 	var oldChild = child;
+		// 	child = oldChild.nextSibling;
+		// 	if(oldChild.tagName!='SCRIPT') {
+		// 	    document.body.removeChild(oldChild);
+		// 	}
+		// }
+		var keep = $("#detail")[0];
+		while (document.body.firstChild) {
+		    document.body.removeChild(document.body.firstChild);
+		}
+		document.body.appendChild(keep);
+		document.getElementsByTagName('html')[0].classList.remove("w1190");
+		var addCart = $(".tb-btn-basket")[0];
+		$(".tb-wrap")[0].removeChild($(".tb-key")[0]);
+		$(".tb-wrap")[0].appendChild(addCart);
+		addCart.innerHTML="<a href='#' rel='nofollow' style='margin: 20px 50px; line-height: 66px; height: 66px; min-width: 400px;'>Choose this item!</a>";
+		// $("#J_LinkBasket")[0].innerHTML="Choose this item!";
+		// $("#J_LinkBasket")[0].style.margin = "20px 50px";
+		// $("#J_LinkBasket")[0].style.lineHeight = "66px";
+		// $("#J_LinkBasket")[0].style.height = "66px";
+		// $("#J_LinkBasket")[0].style.minWidth = "400px";
+
+		$("#J_DetailMeta")[0].style.margin = "80px 0 0 0";
+		$(".tm-detail-meta")[0].style.minHeight	= "560px"
+		$(".tm-action")[0].parentNode.removeChild($(".tm-action")[0]);
+		$(".tb-meta")[0].parentNode.removeChild($(".tb-meta")[0]);
+		//$(".tm-ind-emPointCount")[0].parentNode.removeChild($(".tm-ind-emPointCount")[0]);
+		$(".tm-ser")[0].parentNode.removeChild($(".tm-ser")[0]);
+
+		$(".tb-btn-basket")[0].onclick=function(){
+			console.log($("#taskFinish"));
+			$("#taskFinish").submit();
+		};
+	}
+
 	var shade = document.createElement('div');
 	shade.className = 'shade';
 
@@ -117,16 +170,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	var i2 = document.createElement("input"); //input element, text
 	i2.setAttribute('type',"text");
 	i2.setAttribute('name',"url");
-	i2.setAttribute('size','100%');
+	i2.setAttribute('value', document.URL);
+	// i2.setAttribute('size','100%');
+	i2.style.visibility = "hidden";
 
 	// submit as line above
-	var submitButton = document.createElement("input"); //input element, Submit button
-	submitButton.setAttribute('type',"submit");
-	submitButton.setAttribute('value',"Submit");
+	// var submitButton = document.createElement("input"); //input element, Submit button
+	// submitButton.setAttribute('type',"submit");
+	// submitButton.setAttribute('value',"Submit");
 
 	f.appendChild(i);
 	f.appendChild(i2);
-	f.appendChild(submitButton);
+	// f.appendChild(submitButton);
 
 	modal.appendChild(f);
 
@@ -176,8 +231,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	$(f).submit(function(){
 	   var formData = $(this).serialize();
 	   console.log(formData);
-	   var url = i2.value;
-	   console.log(url);
+	   //var url = i2.value;
+	   //console.log(url);
 		// $.ajax({
 		//     url: window.localStorage.getItem('submitUrl'),
 		//     type: "post",

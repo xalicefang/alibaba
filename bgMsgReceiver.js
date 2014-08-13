@@ -61,10 +61,35 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			chrome.windows.create({url: '/exp/finished.html'});
 	    	chrome.windows.getAll(null, removeOtherWin);
 	    } else {
-	    	sendResponse({finished: false});
+	    	sendResponse({finished: false}); 
+	    	if (request.finishedTask==1) {
+	    		var url = "http://s.taobao.com/search?q=%D4%B2%D6%E9%B1%CA%BF%C9%B0%AE&tianmao=1&task=2";
+	    	} else if (request.finishedTask==2) {
+	    		var url = "http://s.taobao.com/search?q=%C7%A6%B1%CA%BF%C9%B0%AE&tianmao=1&task=3";
+	    	} else if (request.finishedTask==3) {
+	    		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%BF%C9%B0%AE&tianmao=1&task=4";
+	    	} if (request.finishedTask==4) {
+	    		var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1&task=5";
+	    	} else if (request.finishedTask==5) {
+	    		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1&task=6";
+	    	} else if (request.finishedTask==6) {
+	    		var url = "http://s.taobao.com/search?q=%C7%AE%B0%FC%B4%B4%D2%E2+&tianmao=1&task=7";
+	    	} else if (request.finishedTask==7) {
+	    		var url = "http://s.taobao.com/search?q=%CA%D6%BB%FA%BF%C7%BF%C9%B0%AE&tianmao=1&task=8";
+	    	} else if (request.finishedTask==8) {
+	    		var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1&task=9";
+	    	} else if (request.finishedTask==9) {
+	    		var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%B4%B4%D2%E2&tianmao=1&task=10";
+	    	} else
+	    		// for testing only!!
+				sendResponse({finished: true});
+				chrome.windows.create({url: '/exp/finished.html'});
+				chrome.windows.getAll(null, removeOtherWin);
+	    	}
+	    	chrome.windows.create({url: url});
 	    	// QUALTRICS!!
-	    	var qualtricsURL = 'https://stanforduniversity.qualtrics.com/SE/?SID=SV_4YqyXNcsWvyB26x&userID='+ window.localStorage.getItem('userID') +'&task='+ request.finishedTask +'&condition=' + window.localStorage.getItem('condition');
-            chrome.windows.create({url: qualtricsURL});
+	    	//var qualtricsURL = 'https://stanforduniversity.qualtrics.com/SE/?SID=SV_4YqyXNcsWvyB26x&userID='+ window.localStorage.getItem('userID') +'&task='+ request.finishedTask +'&condition=' + window.localStorage.getItem('condition');
+            //chrome.windows.create({url: qualtricsURL});
 		    chrome.windows.getAll(null, removeOtherWin);
 		}
 

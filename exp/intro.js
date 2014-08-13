@@ -59,7 +59,7 @@ $("form#intro").submit(function(){
                         window.localStorage.setItem('stopTime',seconds+totalTime); 
 
                         var a = document.createElement('a');
-                        a.href     = "http://www.taobao.com/?task=1";
+                        a.href     = "http://s.taobao.com/search?q=%D0%A1%B1%BE%D7%D3%BF%C9%B0%AE&tianmao=1&task=1";
                         a.target   = '_self';
                         a.click();
                     });
