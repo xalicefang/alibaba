@@ -181,11 +181,32 @@ function backgroundTab() {
 document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
 
-
-if (window.localStorage.getItem('task')==1 || window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==10) {
-  console.log("same tab");
-  document.addEventListener('DOMNodeInserted', sameTab);
-} else if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')==6 || window.localStorage.getItem('task')==9) {
-  console.log("background tab")
-  document.addEventListener('DOMNodeInserted', backgroundTab);
-} 
+if (window.localStorage.getItem('task')==1) {
+   console.log("same tab");
+    document.addEventListener('DOMNodeInserted', sameTab);
+}
+if (window.localStorage.getItem('condition')==1) {
+  if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==8) {
+    console.log("same tab");
+    document.addEventListener('DOMNodeInserted', sameTab);
+  } else if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')==6 || window.localStorage.getItem('task')==9) {
+    console.log("background tab")
+    document.addEventListener('DOMNodeInserted', backgroundTab);
+  } 
+} else if (window.localStorage.getItem('condition')==2) {
+  if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')== 6 || window.localStorage.getItem('task')==9) {
+    console.log("same tab");
+    document.addEventListener('DOMNodeInserted', sameTab);
+  } else if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')==7 || window.localStorage.getItem('task')==10) {
+    console.log("background tab")
+    document.addEventListener('DOMNodeInserted', backgroundTab);
+  } 
+} else {
+  if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')== 7 || window.localStorage.getItem('task')==10) {
+    console.log("same tab");
+    document.addEventListener('DOMNodeInserted', sameTab);
+  } else if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')==5 || window.localStorage.getItem('task')==8) {
+    console.log("background tab")
+    document.addEventListener('DOMNodeInserted', backgroundTab);
+  } 
+}
