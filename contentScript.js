@@ -129,20 +129,18 @@ window.onbeforeunload = function() {
 };
 
 function allLinks(e) {
-  alert(this.href);
   if (this.href.indexOf("s.taobao.com") != -1) {
-    chrome.runtime.sendMessage({list: this.href});
+    // pass over page number
+    chrome.runtime.sendMessage({list: this.innerHTML});
   } else if (this.href.indexOf("detail.tmall.com") != -1) {
     chrome.runtime.sendMessage({detail: this.href});
   } else {
     // i don't know what happened
   }
-  // if not new tab - why do we need this?
-  if (history.length > 1) {
-    //alert(a[i].href);
-    // pretty sure we don't actually need to pass the href - used just as a bool
-    chrome.runtime.sendMessage({link: this.href});
-  }
+  // if not new tab - why do we need this? doesn't work for background tabs
+  // if (history.length > 1) {
+  //   chrome.runtime.sendMessage({link: this.href});
+  // }
 }
 // add onclick event for all links!
 function nodeInsertedCallback(event) {

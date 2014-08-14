@@ -2,22 +2,14 @@ function getParameterFromString(url, name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
-window.localStorage.setItem(itemsViewed,[]);
-
 // clean this up and make methods!!
 
 // calculate loading time for same tab address bar, back, refresh, etc. 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// click link, open in same tab (new tab covered by onActivated)
 	if (request.link) {
-	  // be sure to match url with permissions!!!!!!!!!
-	  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        var tab = tabs[0];
-        // i don't think i need the if anymore. remove???!!
-        if (tab.id==sender.tab.id) {
-          clickedLink(request.link);
-        }
-      });
+		console.log("clicked link same tab");
+        clickedLinkSameTab(request.link);
     } 
     // if active tab dom loaded
     else if (request.domLoaded) {
@@ -98,8 +90,9 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		    chrome.windows.getAll(null, removeOtherWin);
 		}
 
-		downloadCSV();
+		downloadCSVPage();
 		downloadCSVLoading();
+		downloadCSV();
 		downloadCSVNumber();
 	} 
 
@@ -139,15 +132,30 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 	// page types
 	else if (request.list) {
-		console.log("list: " + request.list);
-		getParameterFromString(request.list, 's');
+		var page = request.list - 1;
+		if (pagesViewed[page]) {
+			pagesViewed[page].count++;
+		} else {
+			pagesViewed[page] = {'count':1, 'time':0};
+		}
+		// console.log(pagesViewed[page]);
 	}
 
 	else if (request.detail) {
-		console.log("detail: " + request.detail);
-		getParameterFromString(request.detail, 'id');
-		var items = window.localStorage.getItem('itemsViewed');
-		// !!!
+		var id = getParameterFromString(request.detail, 'id');
+		var found = false;
+		for (var i = 0; i < itemsViewed.length; i++) {
+			if (itemsViewed[i].id == id) {
+				itemsViewed[i].count++;
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			var item = {'id':id, 'count':1, 'time':0};
+			itemsViewed.push(item);
+		}
+		// console.log(itemsViewed);
 	}
 });
 
@@ -156,9 +164,11 @@ function removeOtherWin(windows) {
 		alert("Closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {
-				//!!!!!!!!
-				//chrome.windows.remove(windows[i].id);
+				chrome.windows.remove(windows[i].id);
 			}
 		}
 	});
+	// set lastTime etc. before opening new window - put this on load task for first time???!!
+	lastTime = Date.now();
+	lastInfo = {'type':'list', 'id':pageNum};
 }

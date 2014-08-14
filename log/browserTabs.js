@@ -1,12 +1,3 @@
-function clickedLink(href) {
-  chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
-    var tab = tabs[0];
-    //console.log("clicked link same tab");
-    makeRow("clickedLinkSameTab",tab.id,tab.index,tab.windowId,tab.url);
-    startTime = Date.now();
-  });
-}
-
 csvString = '';
 
 chrome.tabs.onCreated.addListener(newTab);

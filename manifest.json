@@ -5,7 +5,7 @@
   "description": "Alibaba User Experience Design research study on Taobao search.",
   "background": {
     "persistent": true,
-    "scripts": ["3party/jquery-1.11.1.js","exp/intro.js","bgMsgReceiver.js","log/browserTabs.js","log/numberTabs.js","log/loadingTime.js","exp/expBg.js"]
+    "scripts": ["3party/jquery-1.11.1.js","exp/intro.js","log/pageCountTime.js","bgMsgReceiver.js","log/browserTabs.js","log/numberTabs.js","log/loadingTime.js","exp/expBg.js"]
   },
   "browser_action": {
     "default_title": "Taobao Search Study"
