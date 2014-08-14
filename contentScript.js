@@ -128,19 +128,26 @@ window.onbeforeunload = function() {
   chrome.runtime.sendMessage({unload: true});
 };
 
+function allLinks(e) {
+  alert(this.href);
+  if (this.href.indexOf("s.taobao.com") != -1) {
+    chrome.runtime.sendMessage({list: this.href});
+  } else if (this.href.indexOf("detail.tmall.com") != -1) {
+    chrome.runtime.sendMessage({detail: this.href});
+  } else {
+    // i don't know what happened
+  }
+  // if not new tab - why do we need this?
+  if (history.length > 1) {
+    //alert(a[i].href);
+    // pretty sure we don't actually need to pass the href - used just as a bool
+    chrome.runtime.sendMessage({link: this.href});
+  }
+}
 // add onclick event for all links!
 function nodeInsertedCallback(event) {
-    // there's repeats with related node, but it covers everything
-    var a = event.relatedNode.getElementsByTagName('a');
-    for (i=0;i<a.length;i++) { 
-        a[i].onclick = function() {
-          // if not new tab
-          if (history.length > 1) {
-            //alert(a[i].href);
-            chrome.runtime.sendMessage({link: a[i].href});
-          }
-        };
-    }
+  $( "a" ).unbind( "click", allLinks );
+  $( "a" ).bind( "click", allLinks );
 }
 
 function sameTab(event) {
@@ -160,22 +167,23 @@ function sameTab(event) {
   }
 }
 
+function backgroundLinks(e) {
+  e.preventDefault();
+  var a = $(this)[0].href;
+  // exclude the expand/ min link
+  if (a.indexOf('#', a.length - 1) === -1) {
+    var b = document.createElement('a');
+    // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+    b.href = a;
+    var evt = document.createEvent("MouseEvents");
+    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+    b.dispatchEvent(evt);
+  }
+}
+
 function backgroundTab() {
-  // unbind previous links (to prevent repeats), needed because user click links while nodes added
-  $( "a" ).unbind();
-  $( "a" ).click(function(e) {
-    e.preventDefault();
-    var a = $(this)[0].href;
-    // exclude the expand/ min link
-    if (a.indexOf('#', a.length - 1) === -1) {
-      var b = document.createElement('a');
-      // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
-      b.href = a;
-      var evt = document.createEvent("MouseEvents");
-      evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
-      b.dispatchEvent(evt);
-    }
-  });
+  $( "a" ).unbind( "click", backgroundLinks );
+  $( "a" ).bind( "click", backgroundLinks );
 }
 
 document.addEventListener('DOMNodeInserted', nodeInsertedCallback);

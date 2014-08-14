@@ -48,6 +48,7 @@ function updated(tabId, changeInfo, tab) {
 }
 
 function activated(activeInfo) {
+  console.log("active!");
   chrome.tabs.get(activeInfo.tabId, function(tab) {
     makeRow("activated",activeInfo.tabId,activeInfo.windowId,tab.index,tab.url);
   });

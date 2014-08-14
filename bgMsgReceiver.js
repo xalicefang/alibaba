@@ -1,3 +1,9 @@
+function getParameterFromString(url, name) {
+	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url)||[,""])[1].replace(/\+/g, '%20'))||null;
+}
+
+window.localStorage.setItem(itemsViewed,[]);
+
 // clean this up and make methods!!
 
 // calculate loading time for same tab address bar, back, refresh, etc. 
@@ -68,7 +74,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    		var url = "http://s.taobao.com/search?q=%C7%A6%B1%CA%BF%C9%B0%AE&tianmao=1&task=3";
 	    	} else if (request.finishedTask==3) {
 	    		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%BF%C9%B0%AE&tianmao=1&task=4";
-	    	} if (request.finishedTask==4) {
+	    	} else if (request.finishedTask==4) {
 	    		var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1&task=5";
 	    	} else if (request.finishedTask==5) {
 	    		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1&task=6";
@@ -80,11 +86,10 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    		var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1&task=9";
 	    	} else if (request.finishedTask==9) {
 	    		var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%B4%B4%D2%E2&tianmao=1&task=10";
-	    	} else
+	    	} else {
 	    		// for testing only!!
 				sendResponse({finished: true});
-				chrome.windows.create({url: '/exp/finished.html'});
-				chrome.windows.getAll(null, removeOtherWin);
+				var url = '/exp/finished.html';
 	    	}
 	    	chrome.windows.create({url: url});
 	    	// QUALTRICS!!
@@ -130,6 +135,19 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			chrome.tabs.update(tab.id, {url: "/exp/finished.html"});
 		});
 		
+	}
+
+	// page types
+	else if (request.list) {
+		console.log("list: " + request.list);
+		getParameterFromString(request.list, 's');
+	}
+
+	else if (request.detail) {
+		console.log("detail: " + request.detail);
+		getParameterFromString(request.detail, 'id');
+		var items = window.localStorage.getItem('itemsViewed');
+		// !!!
 	}
 });
 

@@ -82,16 +82,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$("#J_Social")[0].parentNode.removeChild($("#J_Social")[0]);
 		$(".tb-detail-bd")[0].style.margin = "80px 0 0 0";
 	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
-		// // don't remove scripts!
-		// var child = document.body.firstChild;
-		// while (child) {
-		// 	console.log(child);
-		// 	var oldChild = child;
-		// 	child = oldChild.nextSibling;
-		// 	if(oldChild.tagName!='SCRIPT') {
-		// 	    document.body.removeChild(oldChild);
-		// 	}
-		// }
 		var keep = $("#detail")[0];
 		while (document.body.firstChild) {
 		    document.body.removeChild(document.body.firstChild);
@@ -102,23 +92,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(".tb-wrap")[0].removeChild($(".tb-key")[0]);
 		$(".tb-wrap")[0].appendChild(addCart);
 		addCart.innerHTML="<a href='#' rel='nofollow' style='margin: 20px 50px; line-height: 66px; height: 66px; min-width: 400px;'>Choose this item!</a>";
-		// $("#J_LinkBasket")[0].innerHTML="Choose this item!";
-		// $("#J_LinkBasket")[0].style.margin = "20px 50px";
-		// $("#J_LinkBasket")[0].style.lineHeight = "66px";
-		// $("#J_LinkBasket")[0].style.height = "66px";
-		// $("#J_LinkBasket")[0].style.minWidth = "400px";
-
+		
 		$("#J_DetailMeta")[0].style.margin = "80px 0 0 0";
 		$(".tm-detail-meta")[0].style.minHeight	= "560px"
 		$(".tm-action")[0].parentNode.removeChild($(".tm-action")[0]);
 		$(".tb-meta")[0].parentNode.removeChild($(".tb-meta")[0]);
-		//$(".tm-ind-emPointCount")[0].parentNode.removeChild($(".tm-ind-emPointCount")[0]);
+		if ($(".tm-ind-emPointCount")[0])
+			$(".tm-ind-emPointCount")[0].parentNode.removeChild($(".tm-ind-emPointCount")[0]);
 		$(".tm-ser")[0].parentNode.removeChild($(".tm-ser")[0]);
 
 		$(".tb-btn-basket")[0].onclick=function(){
 			console.log($("#taskFinish"));
 			$("#taskFinish").submit();
 		};
+		//remove link from photo
+		var picDivChildren = $(".tb-booth")[0].childNodes[1];
+		console.log(picDivChildren.childNodes);
+		var pic = picDivChildren.childNodes[1];
+		$(".tb-booth")[0].removeChild($(".tb-booth")[0].childNodes[1]);
+		$(".tb-booth")[0].appendChild(pic);
 	}
 
 	var shade = document.createElement('div');
