@@ -54,7 +54,8 @@ $("form#intro").submit(function(){
 
                         // set timer
                         var seconds = new Date().getTime() / 1000;
-                        var totalTime = 720;
+                        // 10 minutes only
+                        var totalTime = 600;
                         //var totalTime = 60;
                         window.localStorage.setItem('stopTime',seconds+totalTime); 
 

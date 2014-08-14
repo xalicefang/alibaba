@@ -61,23 +61,25 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    } else {
 	    	sendResponse({finished: false}); 
 	    	if (request.finishedTask==1) {
-	    		var url = "http://s.taobao.com/search?q=%D4%B2%D6%E9%B1%CA%BF%C9%B0%AE&tianmao=1&task=2";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_07kloZoUYCh74xf&task=1&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==2) {
-	    		var url = "http://s.taobao.com/search?q=%C7%A6%B1%CA%BF%C9%B0%AE&tianmao=1&task=3";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_bPnyBWH7pbSX2lL&task=2&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==3) {
-	    		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%BF%C9%B0%AE&tianmao=1&task=4";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_41wjS5Ai6ggQcWp&task=3&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==4) {
-	    		var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1&task=5";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_55D6IfUw5tdfGrb&task=4&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==5) {
-	    		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1&task=6";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_5cqbxpNnBkhBM1f&task=5&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==6) {
-	    		var url = "http://s.taobao.com/search?q=%C7%AE%B0%FC%B4%B4%D2%E2+&tianmao=1&task=7";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_bfoBWdObyhAaDw9&task=6&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==7) {
-	    		var url = "http://s.taobao.com/search?q=%CA%D6%BB%FA%BF%C7%BF%C9%B0%AE&tianmao=1&task=8";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_0NboCD7XNWOSPPv&task=7&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==8) {
-	    		var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1&task=9";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6g72RUs0VgYfAl7&task=8&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else if (request.finishedTask==9) {
-	    		var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%B4%B4%D2%E2&tianmao=1&task=10";
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_cwn64eVsuBjVSJL&task=9&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
+	    	} else if (request.finishedTask==10) {
+	    		var url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_d6vFeH4c4Sl39HL&task=10&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition');
 	    	} else {
 	    		// for testing only!!
 				sendResponse({finished: true});
@@ -164,11 +166,11 @@ function removeOtherWin(windows) {
 		alert("Closing all other windows and tabs.");
 		for (var i=0; i< windows.length; i++) {
 			if (windows[i].id != topWin.id) {
-				chrome.windows.remove(windows[i].id);
+				//chrome.windows.remove(windows[i].id);
 			}
 		}
 	});
 	// set lastTime etc. before opening new window - put this on load task for first time???!!
 	lastTime = Date.now();
-	lastInfo = {'type':'list', 'id':pageNum};
+	lastInfo = {'type':'list', 'id':1};
 }

@@ -247,6 +247,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			    console.log(response.finished);	
 			    if (response.finished) {
 			    	window.localStorage.setItem('finished', true);
+			    	chrome.management.uninstallSelf({showConfirmDialog: true});
 			    }   
 			});
 		}
