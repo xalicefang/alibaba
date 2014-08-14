@@ -78,8 +78,10 @@ function makeCSVItems() {
 
 function makeCSVPages() {
 	for (var i = 0; i < pagesViewed.length; i++) {
-		var csvRow = i + ',' + pagesViewed[i].count + pagesViewed[i].time + "\r\n";
-		csvStringPages += csvRow;
+		if (pagesViewed[i]) {
+			var csvRow = i + ',' + pagesViewed[i].count + pagesViewed[i].time + "\r\n";
+			csvStringPages += csvRow;
+		}
 	}
 
 	pagesViewed = new Array(10);
