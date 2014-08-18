@@ -69,7 +69,7 @@ function clickedLinkSameTab(href) {
 
 function makeCSVItems() {
 	for (var i = 0; i < itemsViewed.length; i++) {
-		var csvRow = itemsViewed[i].id + ',' + itemsViewed[i].count + itemsViewed[i].time +"\r\n";
+		var csvRow = itemsViewed[i].id + ',' + itemsViewed[i].count + ',' + itemsViewed[i].time +"\r\n";
 		csvStringItems += csvRow;
 	}
 	
@@ -79,7 +79,7 @@ function makeCSVItems() {
 function makeCSVPages() {
 	for (var i = 0; i < pagesViewed.length; i++) {
 		if (pagesViewed[i]) {
-			var csvRow = i + ',' + pagesViewed[i].count + pagesViewed[i].time + "\r\n";
+			var csvRow = i + ',' + pagesViewed[i].count + ',' + pagesViewed[i].time + "\r\n";
 			csvStringPages += csvRow;
 		}
 	}

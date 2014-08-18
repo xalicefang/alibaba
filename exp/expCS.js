@@ -1,14 +1,36 @@
 if (document.URL.indexOf("exp/finished.html") == -1 && window.localStorage.getItem('finished')) {
 	alert("You have already completed this experiment!");
-	chrome.runtime.sendMessage({sendToFinish:true});
+	chrome.runtime.sendMessage({sendToUninstall:true});
 }
 
 if (!window.localStorage.getItem('started')) {
+	var expStartTime = Date.now();
+	window.localStorage.setItem('expStartTime',expStartTime); 
+
 	window.localStorage.setItem('started',true);
 	var firstTime = {stopTime: window.localStorage.getItem('startTime'), userID: window.localStorage.getItem('userID'), condition: window.localStorage.getItem('condition')};
 	chrome.runtime.sendMessage({started:firstTime});
 }
 
+var timerUpdate = setInterval(function () {
+	var date = new Date("1/1/1970");
+	var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
+	date.setSeconds(secsPassedSinceStart);
+	var minutes = date.getMinutes();
+	var seconds = date.getSeconds();
+	$("#timer")[0].innerHTML = minutes + ":" + seconds;
+	if ((secsPassedSinceStart/60) > 8) {
+		if (window.localStorage.getItem('task') > 4) {
+			clearInterval(timerUpdate);
+			alert("Thanks! Time's up! Redirecting you to a quick wrap-up survey.");
+			chrome.runtime.sendMessage({sendToFinish:true}, function(response) {
+			    window.localStorage.setItem('finished', true);
+			});	
+		} else {
+			chrome.runtime.sendMessage({minTimePassed:true});
+		}
+	}
+}, 1000);
 
 document.addEventListener("DOMContentLoaded", function(event) {
 	// disable right click context menu
@@ -113,6 +135,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(".tb-booth")[0].appendChild(pic);
 	}
 
+	//var iframe = document.createElement('iframe');
+
 	var shade = document.createElement('div');
 	shade.className = 'shade';
 
@@ -129,15 +153,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	logoBox.appendChild(logo);
 	header.appendChild(logo);
 
-	var min = document.createElement('div');
-	min.className = 'min';
-	min.innerHTML = "<a id='minLink' href='#' title='Minimize modal'>&#8212;</a>"
-	header.appendChild(min);
+	// var min = document.createElement('div');
+	// min.className = 'min';
+	// min.innerHTML = "<a id='minLink' href='#' title='Minimize modal'>&#8212;</a>"
+	// header.appendChild(min);
 
-	var expand = document.createElement('div');
-	expand.className = 'expand';
-	expand.innerHTML = "<a id='exLink' href='#' title='Maximize modal'>+</a>"
-	header.appendChild(expand);
+	// var expand = document.createElement('div');
+	// expand.className = 'expand';
+	// expand.innerHTML = "<a id='exLink' href='#' title='Maximize modal'>+</a>"
+	// header.appendChild(expand);
+
+	var timer = document.createElement('div');
+	timer.setAttribute('id',"timer")
+	timer.setAttribute('class',"timer")
+	header.appendChild(timer);
 
 	document.body.appendChild(shade);
 	document.body.appendChild(header);
@@ -181,44 +210,44 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (getURLParameter('task')!= null) {
 		modal.style.visibility = "visible";
 		shade.style.visibility = "visible";
-		min.style.display = "inline";
+		// min.style.display = "inline";
 	} else if (window.localStorage.getItem('taskMsg')) {
-		expand.style.display = "inline";
+		// expand.style.display = "inline";
 	}
 
 	$(shade).click(function() {
 		shade.style.visibility = "hidden";
     	$(modal).slideUp();
-    	min.style.display = "none";
-    	expand.style.display = "inline";
+    	// min.style.display = "none";
+    	// expand.style.display = "inline";
     	return false; 
 	});
 
-	$(min).click(function(){
-    	shade.style.visibility = "hidden";
-    	$(modal).slideUp();
-    	min.style.display = "none";
-    	expand.style.display = "inline";
-    	return false; 
-    });
+	// $(min).click(function(){
+ //    	shade.style.visibility = "hidden";
+ //    	$(modal).slideUp();
+ //    	min.style.display = "none";
+ //    	expand.style.display = "inline";
+ //    	return false; 
+ //    });
 
 	$(header).click(function(){
 		modal.style.visibility = "visible";
 		shade.style.visibility = "visible";
 		$(modal).slideDown();
-    	min.style.display = "inline";
-    	expand.style.display = "none";
+    	// min.style.display = "inline";
+    	// expand.style.display = "none";
     	return false; 
     });
 
-	$(expand).click(function(){
-		modal.style.visibility = "visible";
-		shade.style.visibility = "visible";
-		$(modal).slideDown();
-    	min.style.display = "inline";
-    	expand.style.display = "none";
-    	return false; 
-    });
+	// $(expand).click(function(){
+	// 	modal.style.visibility = "visible";
+	// 	shade.style.visibility = "visible";
+	// 	$(modal).slideDown();
+ //    	min.style.display = "inline";
+ //    	expand.style.display = "none";
+ //    	return false; 
+ //    });
 
 	$(f).submit(function(){
 	   var formData = $(this).serialize();
@@ -247,7 +276,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			    console.log(response.finished);	
 			    if (response.finished) {
 			    	window.localStorage.setItem('finished', true);
-			    	chrome.management.uninstallSelf({showConfirmDialog: true});
 			    }   
 			});
 		}

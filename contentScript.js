@@ -4,14 +4,16 @@ function getURLParameter(name) {
 
 // set every page. - local storage doesn't persist between domains!
 //if (window.localStorage.getItem('userID')==null) {
-  chrome.runtime.sendMessage({user: true}, function(response) {
+  chrome.runtime.sendMessage({getEssentials: true}, function(response) {
     //alert("response " + response.user);
-    console.log(response);
     window.localStorage.setItem('userID', response.user);
     window.localStorage.setItem('condition', response.condition);
-
   });
 //}
+
+if (document.URL.indexOf("stanford.edu/~fangx/cgi-bin/alibaba/redirect.html") != -1) {
+  chrome.runtime.sendMessage({checkFinished: true});
+}
 
 window.localStorage.setItem('taskMsg', "Imagine you are shopping for presents and landed on this listings page. Please click to explore the items, and select an item that you like and is reasonable in price. Please take your time and browse as you normally would. The experiment will take 15 minutes no matter how fast/ slow you browse.");
 
@@ -167,6 +169,10 @@ function sameTab(event) {
 
 function backgroundLinks(e) {
   e.preventDefault();
+  //!!!!!!!!!!!!!!!!!!!!!!!!!??????????????????
+  // if ($(this)[0].parentNode && $(this)[0].parentNode.classList.indexOf("page-wrap") != -1) {
+  //   console.log($(this)[0]);
+  // }
   var a = $(this)[0].href;
   // exclude the expand/ min link
   if (a.indexOf('#', a.length - 1) === -1) {
@@ -188,34 +194,47 @@ document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
 
 if (window.localStorage.getItem('task')==1) {
-   console.log("same tab");
-    document.addEventListener('DOMNodeInserted', sameTab);
-}
-if (window.localStorage.getItem('condition')==1) {
-  console.log("condition 1");
-  if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==8) {
-    console.log("same tab");
-    document.addEventListener('DOMNodeInserted', sameTab);
-  } else if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')==6 || window.localStorage.getItem('task')==9) {
-    console.log("background tab")
-    document.addEventListener('DOMNodeInserted', backgroundTab);
-  } 
-} else if (window.localStorage.getItem('condition')==2) {
-  console.log("condition 2");
-  if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')== 6 || window.localStorage.getItem('task')==9) {
-    console.log("same tab");
-    document.addEventListener('DOMNodeInserted', sameTab);
-  } else if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')==7 || window.localStorage.getItem('task')==10) {
-    console.log("background tab")
-    document.addEventListener('DOMNodeInserted', backgroundTab);
-  } 
-} else {
-  console.log("condition 3");
-  if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')== 7 || window.localStorage.getItem('task')==10) {
-    console.log("same tab");
-    document.addEventListener('DOMNodeInserted', sameTab);
-  } else if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')==5 || window.localStorage.getItem('task')==8) {
-    console.log("background tab")
-    document.addEventListener('DOMNodeInserted', backgroundTab);
-  } 
-}
+  console.log("same tab");
+  document.addEventListener('DOMNodeInserted', sameTab);
+} else if (window.localStorage.getItem('task')==2) {
+  console.log("background tab");
+  document.addEventListener('DOMNodeInserted', backgroundTab);
+} 
+
+// if (window.localStorage.getItem('task')==1) {
+//    console.log("same tab");
+//     document.addEventListener('DOMNodeInserted', sameTab);
+// }
+// if (window.localStorage.getItem('condition')==1) {
+//   console.log("condition 1");
+//   if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==8) {
+//     console.log("same tab");
+//     document.addEventListener('DOMNodeInserted', sameTab);
+//   } else if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')==6 || window.localStorage.getItem('task')==9) {
+//     console.log("background tab")
+//     document.addEventListener('DOMNodeInserted', backgroundTab);
+//   } 
+// } else if (window.localStorage.getItem('condition')==2) {
+//   console.log("condition 2");
+//   if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')== 6 || window.localStorage.getItem('task')==9) {
+//     console.log("same tab");
+//     document.addEventListener('DOMNodeInserted', sameTab);
+//   } else if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')==7 || window.localStorage.getItem('task')==10) {
+//     console.log("background tab")
+//     document.addEventListener('DOMNodeInserted', backgroundTab);
+//   } 
+// } else {
+//   console.log("condition 3");
+//   if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')== 7 || window.localStorage.getItem('task')==10) {
+//     console.log("same tab");
+//     document.addEventListener('DOMNodeInserted', sameTab);
+//   } else if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')==5 || window.localStorage.getItem('task')==8) {
+//     console.log("background tab")
+//     document.addEventListener('DOMNodeInserted', backgroundTab);
+//   } 
+// }
+
+// $.get( "http://detail.tmall.com/item.htm?spm=a230r.1.14.3.noSSs1&id=38548416168&ad_id=&am_id=&cm_id=140105335569ed55e27b&pm_id=", function( data ) {
+//   console.log(data);
+//   alert( "Load was performed." );
+// });

@@ -5,5 +5,5 @@ console.log(finishData);
 $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/finish.php', finishData, function(r) {
 });
 
-//!!! can't do with qualtrics
-//chrome.management.uninstallSelf({showConfirmDialog: true});
+// uninstall
+chrome.management.uninstallSelf({showConfirmDialog: true});

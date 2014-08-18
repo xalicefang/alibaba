@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Taobao search study",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "description": "Alibaba User Experience Design research study on Taobao search.",
   "background": {
     "persistent": true,
@@ -12,13 +12,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.taobao.com/*","*://stanford.edu/~fangx/cgi-bin/alibaba/*","*://alicefang.com/*","*://*.tmall.com/*"], 
+      "matches": ["*://*.taobao.com/*","*://stanford.edu/~fangx/cgi-bin/alibaba/*","*://*.tmall.com/*"], 
       "js":["3party/jquery-1.11.1.js","contentScript.js","exp/expCS.js","exp/inactive.js"],
       "css": ["exp/expStyle.css"],
       "run_at": "document_start"
     }
   ],
   "permissions": [
+    "*://*.taobao.com/*",
+    "*://stanford.edu/~fangx/cgi-bin/alibaba/*",
+    "*://*.tmall.com/*",
     "tabs",
     "webNavigation"
   ]

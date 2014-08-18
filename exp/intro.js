@@ -50,7 +50,6 @@ $("form#intro").submit(function(){
                     window.localStorage.setItem('condition', condition);
                     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/updateIntro.php', condData, function() {
                         console.log("condition: " + condition);
-                        chrome.windows.getAll(null, chrome.extension.getBackgroundPage().removeOtherWin);
 
                         // set timer
                         var seconds = new Date().getTime() / 1000;
@@ -60,7 +59,7 @@ $("form#intro").submit(function(){
                         window.localStorage.setItem('stopTime',seconds+totalTime); 
 
                         var a = document.createElement('a');
-                        a.href     = "http://s.taobao.com/search?q=%D0%A1%B1%BE%D7%D3%BF%C9%B0%AE&tianmao=1&task=1";
+                        a.href     = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_0v4DD5BNv8SuCEZ";
                         a.target   = '_self';
                         a.click();
                     });

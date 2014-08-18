@@ -32,6 +32,19 @@
     float:left;
 }
 
+.timer {
+    position: absolute;
+    right: 30px;
+    margin-top: 0px;
+    font-size: 30px;
+    color:gray;
+    float:right;
+    padding-top:4px;
+    font-weight: bold;
+    margin-right:110px;
+    top:0;
+}
+
 .expand {
     position: absolute;
     right: 30px;
