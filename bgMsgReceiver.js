@@ -6,16 +6,17 @@ function getParameterFromString(url, name) {
 
 var finished = false;
 var minTimePassed = false;
-
-function uninstall() {
-	chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
-		var tab = tabs[0];
-		chrome.tabs.update(tab.id, {url: "/exp/finished.html"});
-	});
-}
+var task = 1;
+var taskSeen = false;
+var expStartTime;
 
 // calculate loading time for same tab address bar, back, refresh, etc. 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
+	function postSurvey() {
+		sendResponse({finished: true});
+		chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"});
+	}
+
 	// click link, open in same tab (new tab covered by onActivated)
 	if (request.link) {
 		console.log("clicked link same tab");
@@ -48,12 +49,12 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 	// store task on start and task message
 	else if (request.task) {
-		window.localStorage.setItem('task',request.task);
+		task = request.task;
 	}
 
 	// get task
 	else if (request.getTask) {
-	    sendResponse({task: window.localStorage.getItem('task')});
+	    sendResponse({task: task});
 	}
 
 	else if (request.minTimePassed) {
@@ -63,8 +64,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// experimental actions
 	else if (request.finishedTask) {
 
-		// check if min conditions reached
-		if (request.finishedTask==4 && minTimePassed) {
+		// check if min conditions reached, set finished
+		if (request.finishedTask>=4 && minTimePassed) {
 			finished = true;
 	    	sendResponse({finished: true});
 	    } else {
@@ -103,24 +104,58 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	// 	window.localStorage.setItem('stopTime', stopTime);
 	// }
 
-	else if (request.started) {
-		console.log(request.started);
+	else if (request.expStartTime) {
+		expStartTime = request.expStartTime;
+	}
+
+	else if (request.getStartTime) {
+		sendResponse({expStartTime:expStartTime});
+	}
+
+	else if (request.checkTaskSeen) {
+		if (!taskSeen) {
+			sendResponse({setTask:task});
+		}
+		
 	}
 
 	else if (request.sendToUninstall) {
-		uninstall();
+		chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
+			var tab = tabs[0];
+			chrome.tabs.update(tab.id, {url: "/exp/finished.html"});
+		});
 	}
 
 	else if (request.sendToFinish) {
-		finished = true;
-		sendResponse({finished: true});
-		chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"});	
+		postSurvey();		
 	}
 
-	else if (request.checkFinished) {
+	else if (request.redirect) {
 		if (finished) {
-			uninstall();
-		}
+			postSurvey();
+		} else {
+			if (task==1) {
+				var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%BA%AB%B9%FA&tianmao=1"
+	    	} else if (task==2) {
+	    		var url = "http://s.taobao.com/search?q=%C7%AE%B0%FC%B4%B4%D2%E2+&tianmao=1";
+	    	} else if (task==3) {
+	    		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1"
+	    	} else if (task==4) {
+				var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1";
+	    	} else if (task==5) {
+	    		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%B0%FC%D3%CA+%BF%C9%B0%AE+%D1%A7%C9%FA&tianmao=1";
+	    	} else if (task==6) {
+	    		var url = "http://s.taobao.com/search?q=%C7%A6%B1%CA%BF%C9%B0%AE&tianmao=1";
+	    	} else if (task==7) {
+	    		var url = "http://s.taobao.com/search?q=%CA%D6%BB%FA%BF%C7%BF%C9%B0%AE&tianmao=1";
+	    	} else if (task==8) {
+				var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1";
+	    	} else if (task==9) {
+	    		var url = "http://s.taobao.com/search?q=%D4%B2%D6%E9%B1%CA%BF%C9%B0%AE&tianmao=1";
+	    	}
+	    	task++;
+	    	chrome.tabs.update(sender.tab.id, {url: url});
+	    }
 	}
 
 	// page types

@@ -4,12 +4,19 @@ if (document.URL.indexOf("exp/finished.html") == -1 && window.localStorage.getIt
 }
 
 if (!window.localStorage.getItem('started')) {
-	var expStartTime = Date.now();
-	window.localStorage.setItem('expStartTime',expStartTime); 
+	if (document.URL.indexOf("s.taobao.com") != -1) {
+		var expStartTime = Date.now();
+		window.localStorage.setItem('expStartTime',expStartTime); 
 
-	window.localStorage.setItem('started',true);
-	var firstTime = {stopTime: window.localStorage.getItem('startTime'), userID: window.localStorage.getItem('userID'), condition: window.localStorage.getItem('condition')};
-	chrome.runtime.sendMessage({started:firstTime});
+		window.localStorage.setItem('started',true);
+		chrome.runtime.sendMessage({expStartTime:expStartTime});
+	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
+		console.log("tmall started");
+		chrome.runtime.sendMessage({getStartTime:true}, function(response) {
+			console.log(response.expStartTime);
+		    window.localStorage.setItem('expStartTime',response.expStartTime);
+		});
+	}
 }
 
 var timerUpdate = setInterval(function () {
@@ -17,7 +24,11 @@ var timerUpdate = setInterval(function () {
 	var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
 	date.setSeconds(secsPassedSinceStart);
 	var minutes = date.getMinutes();
+	if (minutes < 10)
+		minutes = "0" + minutes;
 	var seconds = date.getSeconds();
+	if (seconds < 10)
+		seconds = "0" + seconds;
 	$("#timer")[0].innerHTML = minutes + ":" + seconds;
 	if ((secsPassedSinceStart/60) > 8) {
 		if (window.localStorage.getItem('task') > 4) {
