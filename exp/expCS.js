@@ -1,4 +1,4 @@
-if (document.URL.indexOf("exp/finished.html") == -1 && window.localStorage.getItem('finished')) {
+if (document.URL.indexOf("finished.html") == -1 && window.localStorage.getItem('finished')) {
 	alert("You have already completed this experiment!");
 	chrome.runtime.sendMessage({sendToUninstall:true});
 }
@@ -24,12 +24,16 @@ var timerUpdate = setInterval(function () {
 	var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
 	date.setSeconds(secsPassedSinceStart);
 	var minutes = date.getMinutes();
-	if (minutes < 10)
-		minutes = "0" + minutes;
-	var seconds = date.getSeconds();
-	if (seconds < 10)
-		seconds = "0" + seconds;
-	$("#timer")[0].innerHTML = minutes + ":" + seconds;
+	// if (minutes < 10)
+	// 	minutes = "0" + minutes;
+	// var seconds = date.getSeconds();
+	// if (seconds < 10)
+	// 	seconds = "0" + seconds;
+	//$("#timer")[0].innerHTML = minutes + ":" + seconds;
+	$("#timer")[0].innerHTML = minutes + " minute";
+	if (minutes > 1)
+		$("#timer")[0].innerHTML += "s";
+
 	if ((secsPassedSinceStart/60) > 8) {
 		if (window.localStorage.getItem('task') > 4) {
 			clearInterval(timerUpdate);
@@ -177,13 +181,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	var timer = document.createElement('div');
 	timer.setAttribute('id',"timer")
 	timer.setAttribute('class',"timer")
-	header.appendChild(timer);
+	if (document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
+		header.appendChild(timer);
+	}
 
 	document.body.appendChild(shade);
 	document.body.appendChild(header);
 
 	var modal = document.createElement('div');
-	modal.innerHTML = '<p>' + window.localStorage.getItem('taskMsg') + '</p>';
+	modal.innerHTML = window.localStorage.getItem('taskMsg');
 	modal.className = "modal expText"; 
 	modal.setAttribute('id','modal');
 	document.body.appendChild(modal);
@@ -217,13 +223,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	modal.appendChild(f);
 
-
-	if (getURLParameter('task')!= null) {
-		modal.style.visibility = "visible";
-		shade.style.visibility = "visible";
-		// min.style.display = "inline";
-	} else if (window.localStorage.getItem('taskMsg')) {
-		// expand.style.display = "inline";
+	if (document.URL.indexOf("s.taobao.com") != -1) {
+		chrome.runtime.sendMessage({firstTimeTask:true}, function(response) {
+			console.log(response.taskSeen);
+			if (!response.taskSeen) {
+				modal.style.visibility = "visible";
+				shade.style.visibility = "visible";
+				// min.style.display = "inline";
+			} else if (window.localStorage.getItem('taskMsg')) {
+				// expand.style.display = "inline";
+			}
+		});
 	}
 
 	$(shade).click(function() {

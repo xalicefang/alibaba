@@ -3,26 +3,27 @@ function getURLParameter(name) {
 }
 
 // set every page. - local storage doesn't persist between domains!
-//if (window.localStorage.getItem('userID')==null) {
-  chrome.runtime.sendMessage({getEssentials: true}, function(response) {
-    //alert("response " + response.user);
-    window.localStorage.setItem('userID', response.user);
-    window.localStorage.setItem('condition', response.condition);
-  });
-//}
+
+chrome.runtime.sendMessage({getEssentials: true}, function(response) {
+  //alert("response " + response.user);
+  window.localStorage.setItem('userID', response.user);
+  window.localStorage.setItem('condition', response.condition);
+});
 
 if(document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
   chrome.runtime.sendMessage({getTask: true}, function(response) {
     window.localStorage.setItem('task', response.task);
+    // problem? async problem??!!!
+    window.localStorage.setItem('taskMsg', response.taskMsg);
+    if ($("#modal")) {
+      $("#modal")[0].innerHTML = response.taskMsg;
+    }
   });
 }
 
 if (document.URL.indexOf("stanford.edu/~fangx/cgi-bin/alibaba/redirect.html") != -1) {
   chrome.runtime.sendMessage({redirect: true});
 }
-
-window.localStorage.setItem('taskMsg', "Imagine you are shopping for presents and landed on this listings page. Please click to explore the items, and select an item that you like and is reasonable in price. Please take your time and browse as you normally would. The experiment will take 15 minutes no matter how fast/ slow you browse.");
-
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {

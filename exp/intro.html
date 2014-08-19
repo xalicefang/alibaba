@@ -11,16 +11,17 @@
 
 <div class="body expText">
 	<h2>Let's get started!</h2>
-	<p>Upon clicking "start," you will be given a series of tasks to complete on Taobao, until 15 minutes is reached. The study will last for approximately 15 minutes regardless of task completion speed. Please perform the tasks as closely as you would in real life.On completion of the study, this extension will be automatically uninstalled and you will receive a &#165;10 in Tmall points in the mailbox of the email you have provided.</p>
+	<p>Upon clicking "start," you will be given a series of shopping task simulations until <b>8 minutes is reached or 4 tasks are completed, whatever is longer</b>. Please perform the tasks as closely as you would in real life; the study will take approximately the same time, no matter your speed. On completion of the study, this extension will be automatically uninstalled and you will receive a &#165;10 in Tmall points in the mailbox of the email you have provided.</p>
 
-	<p>Please note that all currently open Chrome browser windows will close when the study begins.</p>
+	<div class="errors">
+	</div>
 
 	<form id="intro">
 		<label>Name: </label>
-	    <input class="input" type="text" name="name" size="40"/></br>
+	    <input class="input" type="text" name="name" id='nameField' size="40"/></br>
 	    <label>Email: </label>
-	    <input class="input" type="text" name="email" size="40"/></br>
-	    <button>Start</button>
+	    <input class="input" type="text" name="email" id='emailField' size="40"/></br>
+	    <button id="startBtn">Start</button>
 	</form>
 </div>
 
