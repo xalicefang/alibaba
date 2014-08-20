@@ -12,6 +12,7 @@ var taskSeen = false;
 var expStartTime;
 var windowId;
 var startTaskTime = 0;
+var condition;
 
 function deleteAllOtherTabs(tabId) {
 	chrome.tabs.query({windowId: windowId}, function(tabs) {
@@ -48,30 +49,16 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		// chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"});
 	}
 
-	// click link, open in same tab (new tab covered by onActivated)
-	if (request.link) {
-		console.log("clicked link same tab");
-        clickedLinkSameTab(request.link);
-    } 
     // if active tab dom loaded
-    else if (request.domLoaded) {
-	  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  	if (tabs.length > 0) {
-		 	var tab = tabs[0];
-	 		if (tab.id==sender.tab.id) {
-	 			var loadingTime = Date.now() - startTime;
-		 		console.log("yes, current tab is loaded!" + loadingTime);
-		 		makeRowLoading(loadingTime,tab.id,tab.index,tab.windowId,tab.url);
-		 		startTime = Number.NEGATIVE_INFINITY;
-		 	}
-		 	// else calculate background loading time? too hard... later, if time!
-		}
-	  });
+    if (request.domLoaded) {
+		storeFinishedLoading(sender.tab.id);
 	}
 
-	// if click back/ forward/ refresh/ address bar change
+	// if click back/ forward/ refresh/ address bar change/ close
     else if (request.unload) {
-    	startTime = Date.now();
+    	// on same tab only
+    	startLoadingOnUnload();
+    	
     	chrome.tabs.query({"active":true, "lastFocusedWindow":true}, function(tabs) {
 	      var tab = tabs[0];
 	      makeRow("unload",tab.id,tab.index,tab.windowId,tab.url);
@@ -107,7 +94,29 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    	var taskMsg = "Your pens get lost often, and you are looking for some pens that will stand out.";
 	    } 
 	    taskMsg = "<b>Task " + task + ": </b><p>" + taskMsg + "</p></br><p>Please browse the items and select an appropriate item that is reasonable in price. <i>Please browse as you normally would.</i> The study will end when you have completed 4 tasks or when 8 minutes is reached, whichever is longer.</p>";
-	    sendResponse({task:task, taskMsg: taskMsg});
+	    if (window.localStorage.getItem('group')==1) {
+		if (task==1 || task==4 || task==7) 
+		    condition = 's';
+		  else if (task==2 || task==5 || task==8) 
+		    condition = 'b';
+		  else 
+		    condition = 'f';
+		} else if (window.localStorage.getItem('group')==2) {
+		    if (task==2 || task==5 || task==8) 
+		    condition = 's';
+		  else if (task==3 || task==6 || task==9) 
+		    condition = 'b';
+		  else 
+		    condition = 'f';
+		} else if (window.localStorage.getItem('group')==3) {
+		  if (task==3 || task==6 || task==9) 
+		    condition = 's';
+		  else if (task==1 || task==4 || task==7) 
+		    condition = 'b';
+		  else 
+		    condition = 'f';
+		}
+	    sendResponse({task:task, taskMsg:taskMsg, condition:condition});
 	}
 
 	else if (request.minTimePassed) {
@@ -116,7 +125,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 	// experimental actions
 	else if (request.finishedTask) {
+		// mark time for choosing page on browser log
 		makeRow("chose!");
+		// store time on last items page
+		storeTime();
+
 		// check if min conditions reached, set finished
 		if (task>=4 && minTimePassed) {
 			sendToPostSurvey = true;
@@ -131,7 +144,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			deleteAllOtherTabs(tab.id);
 		});
 
-		downloadCSVPage();
+		downloadCSVItems();
 		downloadCSVLoading();
 		downloadCSV();
 
@@ -223,33 +236,6 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    }
 	}
 
-	// page types
-	else if (request.list) {
-		var page = request.list - 1;
-		if (pagesViewed[page]) {
-			pagesViewed[page].count++;
-		} else {
-			pagesViewed[page] = {'count':1, 'time':0};
-		}
-		// console.log(pagesViewed[page]);
-	}
-
-	else if (request.detail) {
-		var id = getParameterFromString(request.detail, 'id');
-		var found = false;
-		for (var i = 0; i < itemsViewed.length; i++) {
-			if (itemsViewed[i].id == id) {
-				itemsViewed[i].count++;
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			var item = {'id':id, 'count':1, 'time':0};
-			itemsViewed.push(item);
-		}
-		// console.log(itemsViewed);
-	}
 });
 
 function removeOtherWin(windows) {
@@ -261,7 +247,4 @@ function removeOtherWin(windows) {
 			}
 		}
 	});
-	// set lastTime etc. before opening new window - put this on load task for first time???!!
-	lastTime = Date.now();
-	lastInfo = {'type':'list', 'id':1};
 }

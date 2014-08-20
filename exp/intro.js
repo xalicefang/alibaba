@@ -70,7 +70,6 @@ $("form#intro").submit(function(e){
                 var groupData = 'group=' + group + '&id=' + parseInt(userID);
 
                 $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/countGroups.php', groupData, function(count) {
-                    console.log("count: " + count);
                     if (count < 30) {
                         window.localStorage.setItem('group', group);
                         $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/updateIntro.php', groupData, function() {

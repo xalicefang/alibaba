@@ -11,9 +11,7 @@ if (!window.localStorage.getItem('started')) {
 		window.localStorage.setItem('started',true);
 		chrome.runtime.sendMessage({expStartTime:expStartTime});
 	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
-		console.log("tmall started");
 		chrome.runtime.sendMessage({getStartTime:true}, function(response) {
-			console.log(response.expStartTime);
 		    window.localStorage.setItem('expStartTime',response.expStartTime);
 		});
 	}
@@ -133,7 +131,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		//remove link from photo
 		var picDivChildren = $(".tb-booth")[0].childNodes[1];
-		console.log(picDivChildren.childNodes);
 		var pic = picDivChildren.childNodes[1];
 		$(".tb-booth")[0].removeChild($(".tb-booth")[0].childNodes[1]);
 		$(".tb-booth")[0].appendChild(pic);

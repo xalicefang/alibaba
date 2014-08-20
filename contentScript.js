@@ -48,10 +48,10 @@ function backgroundTab() {
 if(document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
   chrome.runtime.sendMessage({getTask: true}, function(response) {
     window.localStorage.setItem('task', response.task);
-    if (window.localStorage.getItem('task')==1) {
+    if (response.condition=='s') {
       console.log("same tab");
       document.addEventListener('DOMNodeInserted', sameTab);
-    } else if (window.localStorage.getItem('task')==2) {
+    } else if (response.condition=='b') {
       console.log("background tab");
       document.addEventListener('DOMNodeInserted', backgroundTab);
     } 
@@ -95,38 +95,15 @@ chrome.runtime.onMessage.addListener(
     }
   };
 
-document.addEventListener("DOMContentLoaded", function(event) {
-  chrome.runtime.sendMessage({domLoaded: true});
-});
+document.onreadystatechange = function () {
+  if (document.readyState == "interactive") {
+      chrome.runtime.sendMessage({domLoaded: true});
+  }
+}
 
 window.onbeforeunload = function() {
   chrome.runtime.sendMessage({unload: true});
 };
-
-function allLinks(e) {
-  if (this.href.indexOf("s.taobao.com") != -1) {
-    // pass over page number
-    chrome.runtime.sendMessage({list: this.innerHTML});
-  } else if (this.href.indexOf("detail.tmall.com") != -1) {
-    chrome.runtime.sendMessage({detail: this.href});
-  } else {
-    // i don't know what happened
-  }
-  // if not new tab - why do we need this? doesn't work for background tabs
-  // if (history.length > 1) {
-  //   chrome.runtime.sendMessage({link: this.href});
-  // }
-}
-// add onclick event for all links!
-function nodeInsertedCallback(event) {
-  $( "a" ).unbind( "click", allLinks );
-  $( "a" ).bind( "click", allLinks );
-}
-
-document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
-
-
-
 
 // if (window.localStorage.getItem('task')==1) {
 //    console.log("same tab");

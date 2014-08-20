@@ -3,22 +3,45 @@ csvStringLoading = "";
 
 chrome.tabs.onActivated.addListener(checkLoading);
 
-function checkLoading() {
-	// match with manifest permission
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		if (tabs.length==1) {
-			var tab = tabs[0];
+function startLoadingTime() {
+	startTime = Date.now();
+	console.log(startTime);
+}
 
-			chrome.tabs.sendMessage(tab.id, {get: "readyState"}, function(response) {
-		  		console.log("sent message");
-				if (response==null || response.readyState=="loading") {
-			  		startTime = Date.now();
-			  		console.log(startTime);
-				}
-			});
+function stopLoadingTime(tabUrl) {
+	var loadingTime = Date.now() - startTime;
+	console.log("yes, current tab is loaded!" + loadingTime);
+	makeRowLoading(loadingTime,tabUrl,'l');
+	startTime = Number.NEGATIVE_INFINITY;
+}
 
+function checkLoading(activeInfo) {
+	chrome.tabs.sendMessage(activeInfo.tabId, {get: "readyState"}, function(response) {
+		if (response==null || response.readyState=="loading") {
+	  		startLoadingTime();
+		} else {
+			if (startTime != Number.NEGATIVE_INFINITY) {
+				stopLoadingTime();
+			}
 		}
-	});	
+	});
+}
+
+function startLoadingOnUnload() {
+	if (condition == 's') {
+		startLoadingTime();
+	}
+}
+
+function storeFinishedLoading(parentTabId) {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		if (tabs.length > 0) {
+		 	var tab = tabs[0];
+			if (tab.id==parentTabId) {
+				stopLoadingTime(tab.url);
+		 	}
+		}
+	});
 }
 
 function makeRowLoading() {
@@ -37,18 +60,5 @@ function downloadCSVLoading () {
 		console.log(response);
 	});
 
-	csvStringLoading='';
-}
-
-// from click case
-
-function domLoaded(details) {
-	// only if it's the parent frame!
-	console.log("dom content loaded");
-	console.log(details.url);
-}
-
-function completed(details) {
-	console.log("completed!");
-	console.log(details.url);
+	csvStringLoading = '';
 }

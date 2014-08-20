@@ -1,10 +1,11 @@
-var itemsViewed = [];
-var pagesViewed = new Array(10);
+var listTime = [];
+var itemsViewed = {};
+var csvStringList = '';
 var csvStringItems = '';
-var csvStringPages = '';
 var lastTime = '';
 var lastInfo = '';
 
+// when open tabs activated
 chrome.tabs.onActivated.addListener(activeTabCheckTime);
 // for same tab link cases
 chrome.tabs.onUpdated.addListener(tabUpdatedUrl);
@@ -13,31 +14,22 @@ function storeTime() {
 	if (lastInfo) {
 		var totalTime = Date.now() - lastTime;
 		if (lastInfo.type == 'list') {
-			if (pagesViewed[lastInfo.id-1]) {
-				pagesViewed[lastInfo.id-1].time += totalTime;
-			} else {
-				pagesViewed[lastInfo.id-1] = {'count':1, 'time': totalTime};	
-			}
-			console.log("list " + lastInfo.id + " total time: " + pagesViewed[lastInfo.id-1].time);
+			listTime.push(totalTime);
 		} else if (lastInfo.type =='details') {
-			for (var i = 0; i < itemsViewed.length; i++) {
-				if (itemsViewed[i].id == lastInfo.id) {
-					itemsViewed[i].time += totalTime;
-					console.log("details " + lastInfo.id + " total time: " + itemsViewed[i].time);
-					break;
-				}
+			if (!itemsViewed[lastInfo.id]) {
+				itemsViewed[lastInfo.id] = [];
 			}
+			itemsViewed[lastInfo.id].push(totalTime);
 		}
 	}
 }
 
-function countPageTime(url) {
+function countPageTime(url) {	
 	if (url.indexOf("s.taobao.com") != -1) {
 		// list
-		var pageNum = getParameterFromString(url, 's') / 44 + 1;
 		storeTime();
 		lastTime = Date.now();
-		lastInfo = {'type':'list', 'id':pageNum};
+		lastInfo = {'type':'list'};
 	} else if (url.indexOf("detail.tmall.com") != -1) {
 		// detail
 		var id = getParameterFromString(url, 'id');
@@ -58,51 +50,46 @@ function activeTabCheckTime() {
 
 function tabUpdatedUrl(tabId, changeInfo, tab) {
 	// if open link in same tab
-	if(changeInfo.url && tab.openerTabId==tabId) {
+	if (changeInfo.url && tab.openerTabId==null) {
 		countPageTime(changeInfo.url);
 	}
 }
 
-function clickedLinkSameTab(href) {
-	//countPageTime(href);
-}
-
 function makeCSVItems() {
-	for (var i = 0; i < itemsViewed.length; i++) {
-		var csvRow = itemsViewed[i].id + ',' + itemsViewed[i].count + ',' + itemsViewed[i].time +"\r\n";
+	for (var id in itemsViewed) {
+		var timeArray = itemsViewed[id];
+		var csvRow = id;
+		for (var i = 0; i< timeArray.length; i++) {
+			csvRow += "," + timeArray[i];
+		}
+		csvRow += "\r\n";
 		csvStringItems += csvRow;
 	}
-	
-	itemsViewed = [];
 }
 
-function makeCSVPages() {
-	for (var i = 0; i < pagesViewed.length; i++) {
-		if (pagesViewed[i]) {
-			var csvRow = i + ',' + pagesViewed[i].count + ',' + pagesViewed[i].time + "\r\n";
-			csvStringPages += csvRow;
-		}
+function makeCSVList() {
+	for (var i = 0; i< listTime.length; i++) {
+		csvStringList += listTime[i] + ",";
 	}
-
-	pagesViewed = new Array(10);
+	csvStringList += "\r\n";
 }
 
-function downloadCSVPage () {
+function downloadCSVItems() {
 	makeCSVItems();
-	makeCSVPages();
+	makeCSVList();
+
+	var nameList = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'list.csv';
+
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringList, filename: nameList }, function(response) {
+    });
 
     var nameItems = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'items.csv';
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringItems, filename: nameItems }, function(response) {
-        console.log(response);
     });
 
-    var namePages = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'pages.csv';
-
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringPages, filename: namePages }, function(response) {
-        console.log(response);
-    });
-    
+    itemsViewed = {};
+	listTime = [];
 	csvStringItems = '';
-	csvStringPages = '';
+	csvStringList = '';
 }

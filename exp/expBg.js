@@ -5,7 +5,6 @@ chrome.windows.create({
 chrome.windows.getLastFocused(function(window) {
 	windowId = window.id;
 	chrome.windows.update(windowId, {state:"maximized"});
-	console.log(windowId);
 });
 
 chrome.windows.onFocusChanged.addListener(maintainFocus);
@@ -13,7 +12,6 @@ chrome.windows.onFocusChanged.addListener(maintainFocus);
 chrome.windows.onRemoved.addListener(confirmClose);
 
 function maintainFocus(newWindowId) {
-	console.log(newWindowId);
 	// if not alert
 	if (newWindowId != -1) {
 		chrome.windows.get(newWindowId, function() {
