@@ -31,7 +31,7 @@ function makeRowLoading() {
 }
 
 function downloadCSVLoading () {
-	var name = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'loading.csv';
+	var name = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'loading.csv';
 
 	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringLoading, filename: name }, function(response) {
 		console.log(response);

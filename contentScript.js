@@ -3,20 +3,62 @@ function getURLParameter(name) {
 }
 
 // set every page. - local storage doesn't persist between domains!
-
 chrome.runtime.sendMessage({getEssentials: true}, function(response) {
   //alert("response " + response.user);
   window.localStorage.setItem('userID', response.user);
-  window.localStorage.setItem('condition', response.condition);
+  window.localStorage.setItem('group', response.group);
 });
+
+function sameTab(event) {
+  // there's repeats with related node, but it covers everything
+  var a = event.relatedNode.getElementsByTagName('a');
+  for (i=0; i<a.length; i++) { 
+    if (a[i].target=="_blank") { 
+      a[i].target="_self";
+    }
+  } 
+
+  var b = event.relatedNode.getElementsByTagName('base'); 
+  for (i=0;i<b.length;i++) { 
+    if (b[i].target=="_blank") { 
+        b[i].target="_self";
+    }                 
+  }
+}
+
+function backgroundLinks(e) {
+  e.preventDefault();
+  var a = $(this)[0].href;
+  // exclude the expand/ min link
+  if (a.indexOf('#', a.length - 1) === -1) {
+    var b = document.createElement('a');
+    // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+    b.href = a;
+    var evt = document.createEvent("MouseEvents");
+    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+    b.dispatchEvent(evt);
+  }
+}
+
+function backgroundTab() {
+  $( "a" ).unbind( "click", backgroundLinks );
+  $( "a" ).bind( "click", backgroundLinks );
+}
 
 if(document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
   chrome.runtime.sendMessage({getTask: true}, function(response) {
     window.localStorage.setItem('task', response.task);
-    // problem? async problem??!!!
+    if (window.localStorage.getItem('task')==1) {
+      console.log("same tab");
+      document.addEventListener('DOMNodeInserted', sameTab);
+    } else if (window.localStorage.getItem('task')==2) {
+      console.log("background tab");
+      document.addEventListener('DOMNodeInserted', backgroundTab);
+    } 
     window.localStorage.setItem('taskMsg', response.taskMsg);
+    // set if already there
     if ($("#modal")) {
-      $("#modal")[0].innerHTML = response.taskMsg;
+      $("#modal").innerHTML = response.taskMsg;
     }
   });
 }
@@ -27,30 +69,9 @@ if (document.URL.indexOf("stanford.edu/~fangx/cgi-bin/alibaba/redirect.html") !=
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    // console.log(sender.tab ?
-    //             "from a content script:" + sender.tab.url :
-    //             "from the extension");
     if (request.get == "readyState") {
-      //console.log(document.readyState);
       sendResponse({readyState: document.readyState});
-
   	} 
-
-    else if (request.browserAction == "clicked") {
-      console.log("clicked!");
-      var modal = document.getElementById('modal');
-      modal.style.visibility = "visible";
-    } 
-
-    else if (request.newActivate) {
-      console.log("start watch!");
-      startActiveWatch();
-    }
-
-    else if (request.oldDeactivate) {
-      stopActiveWatch();
-    }
-
   });
 
 // deactivate ctrl-click
@@ -68,7 +89,6 @@ chrome.runtime.onMessage.addListener(
   document.onclick=function(e) {
     if(cntrlIsPressed) {
       cntrlIsPressed = false;
-      // log this??!!!
       alert("Sorry, the 'ctrl' and right click buttons are disabled in this study.");
       e.preventDefault();
       console.log(e);
@@ -103,56 +123,10 @@ function nodeInsertedCallback(event) {
   $( "a" ).bind( "click", allLinks );
 }
 
-function sameTab(event) {
-  // there's repeats with related node, but it covers everything
-  var a = event.relatedNode.getElementsByTagName('a');
-  for (i=0;i<a.length;i++) { 
-    if (a[i].target=="_blank") { 
-      a[i].target="_self";
-    }
-  } 
-
-  var b = event.relatedNode.getElementsByTagName('base'); 
-  for (i=0;i<b.length;i++) { 
-    if (b[i].target=="_blank") { 
-        b[i].target="_self";
-    }                 
-  }
-}
-
-function backgroundLinks(e) {
-  e.preventDefault();
-  //!!!!!!!!!!!!!!!!!!!!!!!!!??????????????????
-  // if ($(this)[0].parentNode && $(this)[0].parentNode.classList.indexOf("page-wrap") != -1) {
-  //   console.log($(this)[0]);
-  // }
-  var a = $(this)[0].href;
-  // exclude the expand/ min link
-  if (a.indexOf('#', a.length - 1) === -1) {
-    var b = document.createElement('a');
-    // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
-    b.href = a;
-    var evt = document.createEvent("MouseEvents");
-    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
-    b.dispatchEvent(evt);
-  }
-}
-
-function backgroundTab() {
-  $( "a" ).unbind( "click", backgroundLinks );
-  $( "a" ).bind( "click", backgroundLinks );
-}
-
 document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
 
-if (window.localStorage.getItem('task')==1) {
-  console.log("same tab");
-  document.addEventListener('DOMNodeInserted', sameTab);
-} else if (window.localStorage.getItem('task')==2) {
-  console.log("background tab");
-  document.addEventListener('DOMNodeInserted', backgroundTab);
-} 
+
 
 // if (window.localStorage.getItem('task')==1) {
 //    console.log("same tab");

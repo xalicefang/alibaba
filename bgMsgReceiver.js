@@ -11,6 +11,7 @@ var task = 0;
 var taskSeen = false;
 var expStartTime;
 var windowId;
+var startTaskTime = 0;
 
 function deleteAllOtherTabs(tabId) {
 	chrome.tabs.query({windowId: windowId}, function(tabs) {
@@ -41,7 +42,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 		sendResponse({finished: true});
 
-		chrome.tabs.create({windowId:windowId, url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"}, function(tab) {
+		chrome.tabs.create({windowId:windowId, url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f&userID=" + window.localStorage.getItem('userID')}, function(tab) {
 			deleteAllOtherTabs(tab.id);
 		});
 		// chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"});
@@ -115,49 +116,45 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 	// experimental actions
 	else if (request.finishedTask) {
-
+		makeRow("chose!");
 		// check if min conditions reached, set finished
-		if (request.finishedTask>=4 && minTimePassed) {
+		if (task>=4 && minTimePassed) {
 			sendToPostSurvey = true;
 	    	sendResponse({finished: true});
 	    } else {
 	    	sendResponse({finished: false}); 
 	    }
 
-	   	var urlParameters = "&task=" + request.finishedTask + "&userID=" + window.localStorage.getItem('userID') + '&condition=' + window.localStorage.getItem('condition'); 
+	   	var urlParameters = "&task=" + task + "&userID=" + window.localStorage.getItem('userID') + '&group=' + window.localStorage.getItem('group'); 
 
 		chrome.tabs.create({windowId:windowId, url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_07kloZoUYCh74xf" + urlParameters}, function(tab) {
 			deleteAllOtherTabs(tab.id);
 		});
-    	// chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_07kloZoUYCh74xf" + urlParameters});
 
 		downloadCSVPage();
 		downloadCSVLoading();
 		downloadCSV();
-		downloadCSVNumber();
+
+		// function submitTask() {
+		// 	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
+		// 		//alert(response);
+		// 	});
+		// 	// save time of submit
+		// 	window.localStorage.setItem('lastTime', currTime); 
+
+		// 	// call save csv files, open new window for new task
+		// 	chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')}, function(response) {
+		// 	    if (response.finished) {
+		// 	    	window.localStorage.setItem('finished', true);
+		// 	    }   
+		// 	});
+		// }
 	} 
 
 	// send userID to content page
 	else if (request.getEssentials) {
-		//alert("bg " + window.localStorage.getItem('userID'));
-	    sendResponse({user: window.localStorage.getItem('userID'), condition: window.localStorage.getItem('condition')});
+	    sendResponse({user: window.localStorage.getItem('userID'), group: window.localStorage.getItem('group')});
 	} 
-
-	// // ??: do we need to use local storage if just in background page?
-	// // stop timer when inactive request
-	// else if (request.stopTimer) {
-	// 	// how much time left till stop
-	// 	var currSec = new Date().getTime() / 1000;
-	// 	window.localStorage.setItem(timeLeft, window.localStorage.getItem('stopTime') - currSec);
-	// } 
-
-	// // start timer when active request
-	// else if (request.startTimer) {
-	// 	// reset stop time
-	// 	var currSec = new Date().getTime() / 1000;
-	// 	var stopTime = currSec + window.localStorage.getItem(timeLeft);
-	// 	window.localStorage.setItem('stopTime', stopTime);
-	// }
 
 	else if (request.expStartTime) {
 		expStartTime = request.expStartTime;
@@ -168,11 +165,15 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	}
 
 	else if (request.firstTimeTask) {
-		console.log(taskSeen);
+		startTaskTime = request.firstTimeTask;
 		sendResponse({taskSeen:taskSeen});
 		if (!taskSeen) {
 			taskSeen = true;
 		}
+	}
+
+	else if (request.getstartTaskTime) {
+		sendResponse({startTaskTime:startTaskTime});
 	}
 
 	else if (request.sendToUninstall) {

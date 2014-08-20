@@ -91,13 +91,13 @@ function downloadCSVPage () {
 	makeCSVItems();
 	makeCSVPages();
 
-    var nameItems = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'items.csv';
+    var nameItems = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'items.csv';
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringItems, filename: nameItems }, function(response) {
         console.log(response);
     });
 
-    var namePages = window.localStorage.getItem('condition') + '-' + window.localStorage.getItem('userID') + '-' + window.localStorage.getItem('task') + '-' + 'pages.csv';
+    var namePages = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'pages.csv';
 
     $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringPages, filename: namePages }, function(response) {
         console.log(response);

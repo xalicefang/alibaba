@@ -42,12 +42,13 @@
 
 .timer {
     position: absolute;
+    text-align: center;
     right: 30px;
     margin-top: 0px;
     font-size: 24px;
     color:gray;
     float:right;
-    padding-top:10px;
+    padding-top:4px;
     font-weight: bold;
     margin-right:110px;
     top:0;

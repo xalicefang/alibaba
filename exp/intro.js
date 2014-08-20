@@ -55,27 +55,25 @@ $("form#intro").submit(function(e){
 
             var sid = Math.ceil(userID/2);
             
-            // get number of condition 1's and condition 2's with completed task 1
-            // save condition to database
-            var condition;
+            // get number of group 1's and group 2's with completed task 1
+            // save group to database
+            var group;
             if (sid%3==1) {
-                condition = 1;
+                group = 1;
             } else if (sid%3==2) {
-                condition = 2;
+                group = 2;
             } else {
-                condition = 3;
+                group = 3;
             }
 
-            function setCondition() {
-                var condData = 'condition=' + condition + '&id=' + parseInt(userID);
-                console.log("condData: " + condData);
+            function setGroup() {
+                var groupData = 'group=' + group + '&id=' + parseInt(userID);
 
-                $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/countConditions.php', condData, function(count) {
+                $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/countGroups.php', groupData, function(count) {
                     console.log("count: " + count);
                     if (count < 30) {
-                        window.localStorage.setItem('condition', condition);
-                        $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/updateIntro.php', condData, function() {
-                            console.log("condition: " + condition);
+                        window.localStorage.setItem('group', group);
+                        $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/updateIntro.php', groupData, function() {
 
                             var a = document.createElement('a');
                             a.href     = "http://stanford.edu/~fangx/cgi-bin/alibaba/redirect.html";
@@ -83,13 +81,12 @@ $("form#intro").submit(function(e){
                             a.click();
                         });
                     } else {
-                        condition = (condition + 1) % 3;
-                        console.log("changed con: " + condition);
-                        setCondition();
+                        group = (group + 1) % 3;
+                        setGroup();
                     }
                 });
             }
-            setCondition();
+            setGroup();
 
         });
 

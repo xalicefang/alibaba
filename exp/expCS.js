@@ -19,37 +19,50 @@ if (!window.localStorage.getItem('started')) {
 	}
 }
 
-var timerUpdate = setInterval(function () {
-	var date = new Date("1/1/1970");
-	var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
-	date.setSeconds(secsPassedSinceStart);
-	var minutes = date.getMinutes();
-	// if (minutes < 10)
-	// 	minutes = "0" + minutes;
-	// var seconds = date.getSeconds();
-	// if (seconds < 10)
-	// 	seconds = "0" + seconds;
-	//$("#timer")[0].innerHTML = minutes + ":" + seconds;
-	$("#timer")[0].innerHTML = minutes + " minute";
-	if (minutes > 1)
-		$("#timer")[0].innerHTML += "s";
+function submitTask() {
+	// call save csv files, open new window for new task
+	chrome.runtime.sendMessage({finishedTask: true}, function(response) {
+	    if (response.finished) {
+	    	window.localStorage.setItem('finished', true);
+	    }
+	});
 
-	if ((secsPassedSinceStart/60) > 8) {
-		if (window.localStorage.getItem('task') > 4) {
-			clearInterval(timerUpdate);
-			alert("Thanks! Time's up! Redirecting you to a quick wrap-up survey.");
-			chrome.runtime.sendMessage({sendToFinish:true}, function(response) {
-			    window.localStorage.setItem('finished', true);
-			});	
-		} else {
-			chrome.runtime.sendMessage({minTimePassed:true});
-		}
-	}
-}, 1000);
+	var currTime = new Date().getTime() / 1000;
+}
 
 document.addEventListener("DOMContentLoaded", function(event) {
 	// disable right click context menu
 	document.body.setAttribute("oncontextmenu","return false");
+
+	// progress timer
+	var timerUpdate = setInterval(function () {
+		var date = new Date("1/1/1970");
+		var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
+		date.setSeconds(secsPassedSinceStart);
+		var minutes = date.getMinutes();
+		// if (minutes < 10)
+		// 	minutes = "0" + minutes;
+		// var seconds = date.getSeconds();
+		// if (seconds < 10)
+		// 	seconds = "0" + seconds;
+		//$("#timer")[0].innerHTML = minutes + ":" + seconds;
+		$("#timer")[0].innerHTML = "Task " + window.localStorage.getItem('task') + ", " + minutes + " minute";
+		if (minutes != 1)
+			$("#timer")[0].innerHTML += "s";
+
+		if ((secsPassedSinceStart/60) > 8) {
+			if (window.localStorage.getItem('task') > 4) {
+				clearInterval(timerUpdate);
+				alert("Thanks! Time's up! Redirecting you to a quick wrap-up survey.");
+				chrome.runtime.sendMessage({sendToFinish:true}, function(response) {
+				    window.localStorage.setItem('finished', true);
+				});	
+			} else {
+				chrome.runtime.sendMessage({minTimePassed:true});
+			}
+		}
+	}, 1000);
+
 
 	// clean taobao search listings page
 	if (document.URL.indexOf("s.taobao.com") != -1) {
@@ -93,32 +106,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 		}
 
-	}
-	// clean taobao items page
-	else if(document.URL.indexOf("item.taobao.com") != -1) {
-		var keep = $("#detail")[0];
-		// // don't remove scripts!
-		var child = document.body.firstChild;
-		while (child) {
-			console.log(child);
-			var oldChild = child;
-			child = oldChild.nextSibling;
-			if(oldChild.tagName!='SCRIPT') {
-			    document.body.removeChild(oldChild);
-			}
-		}
-		document.body.appendChild(keep);
-		// var keep2 = $(".tb-detail-bd")[0];
-		// while (keep2.firstChild) {
-		//     keep2.removeChild(keep2.firstChild);
-		// }
-		// keep.appendChild(keep2);
-		$(".tb-detail-bd")[0].removeChild($(".tb-sidebar")[0]);
-		$(".tb-wrap")[0].removeChild($(".tb-key")[0]);
-		$(".tb-wrap")[0].removeChild($(".tb-extra")[0]);
-		$("#J_Social")[0].parentNode.removeChild($("#J_Social")[0]);
-		$(".tb-detail-bd")[0].style.margin = "80px 0 0 0";
-	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
+		$(".tb-pagination")[0].parentNode.removeChild($(".tb-pagination")[0]);
+
+	} 
+
+	// clean tmall details page
+	else if (document.URL.indexOf("detail.tmall.com") != -1) {
 		var keep = $("#detail")[0];
 		while (document.body.firstChild) {
 		    document.body.removeChild(document.body.firstChild);
@@ -138,10 +131,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			$(".tm-ind-emPointCount")[0].parentNode.removeChild($(".tm-ind-emPointCount")[0]);
 		$(".tm-ser")[0].parentNode.removeChild($(".tm-ser")[0]);
 
-		$(".tb-btn-basket")[0].onclick=function(){
-			console.log($("#taskFinish"));
-			$("#taskFinish").submit();
-		};
 		//remove link from photo
 		var picDivChildren = $(".tb-booth")[0].childNodes[1];
 		console.log(picDivChildren.childNodes);
@@ -149,8 +138,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(".tb-booth")[0].removeChild($(".tb-booth")[0].childNodes[1]);
 		$(".tb-booth")[0].appendChild(pic);
 	}
-
-	//var iframe = document.createElement('iframe');
 
 	var shade = document.createElement('div');
 	shade.className = 'shade';
@@ -168,21 +155,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	logoBox.appendChild(logo);
 	header.appendChild(logo);
 
-	// var min = document.createElement('div');
-	// min.className = 'min';
-	// min.innerHTML = "<a id='minLink' href='#' title='Minimize modal'>&#8212;</a>"
-	// header.appendChild(min);
-
-	// var expand = document.createElement('div');
-	// expand.className = 'expand';
-	// expand.innerHTML = "<a id='exLink' href='#' title='Maximize modal'>+</a>"
-	// header.appendChild(expand);
-
+	var timerContainer = document.createElement('div');
+	timerContainer.setAttribute('class',"timer")
 	var timer = document.createElement('div');
 	timer.setAttribute('id',"timer")
-	timer.setAttribute('class',"timer")
+	timerContainer.appendChild(timer);
+	var belowTime = document.createElement('p');
+	belowTime.style.fontSize = "10px";
+	belowTime.innerHTML = "(out of 4 tasks or 8 minutes)";
+	timerContainer.appendChild(belowTime);
 	if (document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
-		header.appendChild(timer);
+		header.appendChild(timerContainer);
 	}
 
 	document.body.appendChild(shade);
@@ -194,125 +177,38 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	modal.setAttribute('id','modal');
 	document.body.appendChild(modal);
 
-	var f = document.createElement("form");
-	f.setAttribute('method',"post");
-	f.setAttribute('id','taskFinish');
-
-	var i = document.createElement("input"); //input element, text
-	i.setAttribute('type',"text");
-	i.setAttribute('name',"userid");
-	// alert("ecs.js: " + window.localStorage.getItem('userID'));
-    i.setAttribute('value', window.localStorage.getItem('userID'));
-	i.style.visibility = "hidden";
-
-	var i2 = document.createElement("input"); //input element, text
-	i2.setAttribute('type',"text");
-	i2.setAttribute('name',"url");
-	i2.setAttribute('value', document.URL);
-	// i2.setAttribute('size','100%');
-	i2.style.visibility = "hidden";
-
-	// submit as line above
-	// var submitButton = document.createElement("input"); //input element, Submit button
-	// submitButton.setAttribute('type',"submit");
-	// submitButton.setAttribute('value',"Submit");
-
-	f.appendChild(i);
-	f.appendChild(i2);
-	// f.appendChild(submitButton);
-
-	modal.appendChild(f);
-
 	if (document.URL.indexOf("s.taobao.com") != -1) {
-		chrome.runtime.sendMessage({firstTimeTask:true}, function(response) {
-			console.log(response.taskSeen);
+		chrome.runtime.sendMessage({firstTimeTask:Date.now()}, function(response) {
 			if (!response.taskSeen) {
 				modal.style.visibility = "visible";
 				shade.style.visibility = "visible";
-				// min.style.display = "inline";
-			} else if (window.localStorage.getItem('taskMsg')) {
-				// expand.style.display = "inline";
-			}
+			} 
 		});
 	}
 
 	$(shade).click(function() {
 		shade.style.visibility = "hidden";
     	$(modal).slideUp();
-    	// min.style.display = "none";
-    	// expand.style.display = "inline";
     	return false; 
 	});
-
-	// $(min).click(function(){
- //    	shade.style.visibility = "hidden";
- //    	$(modal).slideUp();
- //    	min.style.display = "none";
- //    	expand.style.display = "inline";
- //    	return false; 
- //    });
 
 	$(header).click(function(){
 		modal.style.visibility = "visible";
 		shade.style.visibility = "visible";
 		$(modal).slideDown();
-    	// min.style.display = "inline";
-    	// expand.style.display = "none";
     	return false; 
     });
 
-	// $(expand).click(function(){
-	// 	modal.style.visibility = "visible";
-	// 	shade.style.visibility = "visible";
-	// 	$(modal).slideDown();
- //    	min.style.display = "inline";
- //    	expand.style.display = "none";
- //    	return false; 
- //    });
-
-	$(f).submit(function(){
-	   var formData = $(this).serialize();
-	   console.log(formData);
-	   //var url = i2.value;
-	   //console.log(url);
-		// $.ajax({
-		//     url: window.localStorage.getItem('submitUrl'),
-		//     type: "post",
-		//     data: formData,
-		//     success: function (data) {
-		//         alert(data)
-		//     }
-		// });
-
-
-		function submitTask() {
-			$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
-				//alert(response);
+	if (document.URL.indexOf("detail.tmall.com") != -1) {
+		$(".tb-btn-basket")[0].onclick = function() {
+			chrome.runtime.sendMessage({getstartTaskTime:true}, function(response) {
+				if ((Date.now() - response.startTaskTime)/1000 < 30) {
+					alert("You're going too fast! Please go back and consider some other items!");
+				} else {
+					submitTask();
+				}
 			});
-			// save time of submit
-			window.localStorage.setItem('lastTime', currTime); 
-
-			// call save csv files, open new window for new task
-			chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')}, function(response) {
-			    console.log(response.finished);	
-			    if (response.finished) {
-			    	window.localStorage.setItem('finished', true);
-			    }   
-			});
-		}
-
-		var currTime = new Date().getTime() / 1000;
-		if (window.localStorage.getItem('lastTime') && (window.localStorage.getItem('lastTime') - currTime) < 60) {
-			var r = confirm("Please take your time, and browse as you normally would! The experiment will take the same amount of time no matter your speed of completion. Are you sure you want to submit?");
-			if (r == true) {
-			   submitTask();
-			} 
-		} else {
-			submitTask();
-		}
-
-	    return false;
-	});
-
+		};
+	}
+	
 });
-
