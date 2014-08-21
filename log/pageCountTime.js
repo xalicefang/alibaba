@@ -78,18 +78,13 @@ function downloadCSVItems() {
 	makeCSVItems();
 	makeCSVList();
 
-	var nameList = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'list.csv';
+	var nameList = condition + '_' + window.localStorage.getItem('group') + '_' + window.localStorage.getItem('userID') + '_' + task + '.csv';
 
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringList, filename: nameList }, function(response) {
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringList, filename: nameList, type: 'list'}, function(response) {
     });
 
-    var nameItems = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'items.csv';
+    var nameItems = condition + '_' + window.localStorage.getItem('group') + '_' + window.localStorage.getItem('userID') + '_' + task + '.csv';
 
-    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringItems, filename: nameItems }, function(response) {
+    $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringItems, filename: nameItems, type: 'items'}, function(response) {
     });
-
-    itemsViewed = {};
-	listTime = [];
-	csvStringItems = '';
-	csvStringList = '';
 }

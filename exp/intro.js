@@ -47,7 +47,8 @@ $("form#intro").submit(function(e){
     $('.errors')[0].style.display = "none";
     if (formValidate()) {
         $('#startBtn')[0].setAttribute('disabled',true);
-        $('#startBtn')[0].innerHTML = "Loading...";
+        $('#startBtn')[0].innerHTML = "加载...";
+        //$('#startBtn')[0].innerHTML = "Loading...";
         var formData = $(this).serialize();
 
         $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/submitIntro.php', formData, function(userID) {

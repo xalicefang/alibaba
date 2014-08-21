@@ -1,17 +1,15 @@
 startTime = Number.NEGATIVE_INFINITY;
-csvStringLoading = "";
+csvStringLoading = '';
 
 chrome.tabs.onActivated.addListener(checkLoading);
 
 function startLoadingTime() {
 	startTime = Date.now();
-	console.log(startTime);
 }
 
-function stopLoadingTime(tabUrl) {
+function stopLoadingTime(tabUrl,flag) {
 	var loadingTime = Date.now() - startTime;
-	console.log("yes, current tab is loaded!" + loadingTime);
-	makeRowLoading(loadingTime,tabUrl,'l');
+	makeRowLoading(loadingTime,tabUrl,flag);
 	startTime = Number.NEGATIVE_INFINITY;
 }
 
@@ -21,7 +19,9 @@ function checkLoading(activeInfo) {
 	  		startLoadingTime();
 		} else {
 			if (startTime != Number.NEGATIVE_INFINITY) {
-				stopLoadingTime();
+				chrome.tabs.get(activeInfo.tabId, function(tab) {
+					stopLoadingTime(tab.url,'0');
+				});
 			}
 		}
 	});
@@ -38,7 +38,7 @@ function storeFinishedLoading(parentTabId) {
 		if (tabs.length > 0) {
 		 	var tab = tabs[0];
 			if (tab.id==parentTabId) {
-				stopLoadingTime(tab.url);
+				stopLoadingTime(tab.url,'1');
 		 	}
 		}
 	});
@@ -54,11 +54,8 @@ function makeRowLoading() {
 }
 
 function downloadCSVLoading () {
-	var name = window.localStorage.getItem('group') + '-' + window.localStorage.getItem('userID') + '-' + task + '-' + 'loading.csv';
+	var name = condition + '_' + window.localStorage.getItem('group') + '_' + window.localStorage.getItem('userID') + '_' + task + '.csv';
 
-	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringLoading, filename: name }, function(response) {
-		console.log(response);
+	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/saveCsv.php', { csv: csvStringLoading, filename: name, type: 'loading' }, function(response) {
 	});
-
-	csvStringLoading = '';
 }

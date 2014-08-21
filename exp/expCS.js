@@ -1,5 +1,6 @@
 if (document.URL.indexOf("finished.html") == -1 && window.localStorage.getItem('finished')) {
-	alert("You have already completed this experiment!");
+	//alert("You have already completed this experiment!");
+	alert("你已经完成了这个实验！");
 	chrome.runtime.sendMessage({sendToUninstall:true});
 }
 
@@ -7,7 +8,6 @@ if (!window.localStorage.getItem('started')) {
 	if (document.URL.indexOf("s.taobao.com") != -1) {
 		var expStartTime = Date.now();
 		window.localStorage.setItem('expStartTime',expStartTime); 
-
 		window.localStorage.setItem('started',true);
 		chrome.runtime.sendMessage({expStartTime:expStartTime});
 	} else if (document.URL.indexOf("detail.tmall.com") != -1) {
@@ -32,34 +32,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	// disable right click context menu
 	document.body.setAttribute("oncontextmenu","return false");
 
-	// progress timer
-	var timerUpdate = setInterval(function () {
-		var date = new Date("1/1/1970");
-		var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
-		date.setSeconds(secsPassedSinceStart);
-		var minutes = date.getMinutes();
-		// if (minutes < 10)
-		// 	minutes = "0" + minutes;
-		// var seconds = date.getSeconds();
-		// if (seconds < 10)
-		// 	seconds = "0" + seconds;
-		//$("#timer")[0].innerHTML = minutes + ":" + seconds;
-		$("#timer")[0].innerHTML = "Task " + window.localStorage.getItem('task') + ", " + minutes + " minute";
-		if (minutes != 1)
-			$("#timer")[0].innerHTML += "s";
+	if (document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1 ) {
+		// progress timer
+		var timerUpdate = setInterval(function () {
+			var date = new Date("1/1/1970");
+			var secsPassedSinceStart = parseInt(Date.now() - window.localStorage.getItem('expStartTime'))/1000;
+			date.setSeconds(secsPassedSinceStart);
+			var minutes = date.getMinutes();
+			// if (minutes < 10)
+			// 	minutes = "0" + minutes;
+			// var seconds = date.getSeconds();
+			// if (seconds < 10)
+			// 	seconds = "0" + seconds;
+			//$("#timer")[0].innerHTML = minutes + ":" + seconds;
+			$("#timer")[0].innerHTML = "任务 " + window.localStorage.getItem('task') + ", " + minutes + " 分钟";
+			// if (minutes != 1)
+			// 	$("#timer")[0].innerHTML += "s";
 
-		if ((secsPassedSinceStart/60) > 8) {
-			if (window.localStorage.getItem('task') > 4) {
-				clearInterval(timerUpdate);
-				alert("Thanks! Time's up! Redirecting you to a quick wrap-up survey.");
-				chrome.runtime.sendMessage({sendToFinish:true}, function(response) {
-				    window.localStorage.setItem('finished', true);
-				});	
-			} else {
-				chrome.runtime.sendMessage({minTimePassed:true});
+			if ((secsPassedSinceStart/60) > 8) {
+				if (window.localStorage.getItem('task') > 4) {
+					clearInterval(timerUpdate);
+					//alert("Thanks! Time's up! Redirecting you to a quick wrap-up survey.");
+					alert("谢谢！时间到了！重定向你到一个快速总结调查。");
+					chrome.runtime.sendMessage({sendToFinish:true}, function(response) {
+					    window.localStorage.setItem('finished', true);
+					});	
+				} else {
+					chrome.runtime.sendMessage({minTimePassed:true});
+				}
 			}
-		}
-	}, 1000);
+		}, 1000);
+	}
 
 
 	// clean taobao search listings page
@@ -119,7 +122,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		var addCart = $(".tb-btn-basket")[0];
 		$(".tb-wrap")[0].removeChild($(".tb-key")[0]);
 		$(".tb-wrap")[0].appendChild(addCart);
-		addCart.innerHTML="<a href='#' rel='nofollow' style='margin: 20px 50px; line-height: 66px; height: 66px; min-width: 400px;'>Choose this item!</a>";
+		//addCart.innerHTML="<a href='#' rel='nofollow' style='margin: 20px 50px; line-height: 66px; height: 66px; min-width: 400px;'>Choose this item!</a>";
+		addCart.innerHTML="<a href='#' rel='nofollow' style='margin: 20px 50px; line-height: 66px; height: 66px; min-width: 400px;'>选择这个！</a>";
 		
 		$("#J_DetailMeta")[0].style.margin = "80px 0 0 0";
 		$(".tm-detail-meta")[0].style.minHeight	= "560px"
@@ -159,7 +163,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	timerContainer.appendChild(timer);
 	var belowTime = document.createElement('p');
 	belowTime.style.fontSize = "10px";
-	belowTime.innerHTML = "(out of 4 tasks or 8 minutes)";
+	// belowTime.innerHTML = "(out of 4 tasks or 8 minutes)";
+	belowTime.innerHTML = "(总共4个任务或8分钟)";
 	timerContainer.appendChild(belowTime);
 	if (document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
 		header.appendChild(timerContainer);
@@ -200,7 +205,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		$(".tb-btn-basket")[0].onclick = function() {
 			chrome.runtime.sendMessage({getstartTaskTime:true}, function(response) {
 				if ((Date.now() - response.startTaskTime)/1000 < 30) {
-					alert("You're going too fast! Please go back and consider some other items!");
+					//alert("You're going too fast! Please go back and consider some other items! The study requires a minimum of 8 minutes.");
+					alert("你做的太快了！请回去考虑一些其他的产品！");
+					chrome.runtime.sendMessage({sentAlert:true});
 				} else {
 					submitTask();
 				}
