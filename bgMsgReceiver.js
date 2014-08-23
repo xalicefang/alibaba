@@ -122,28 +122,32 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	    // 	var taskMsg = "Your pens get lost often, and you are looking for some pens that will stand out.";
 	    // } 
 	    // taskMsg = "<b>Task " + task + ": </b><p>" + taskMsg + "</p></br><p>Please browse the items and select an appropriate item that is reasonable in price. <i>Please browse as you normally would.</i> The study will end when you have completed 4 tasks or when 8 minutes is reached, whichever is longer.</p>";
-	    if (window.localStorage.getItem('group')==1) {
-		if (task==1 || task==4 || task==7) 
-		    condition = 's';
-		  else if (task==2 || task==5 || task==8) 
-		    condition = 'b';
-		  else 
-		    condition = 'f';
-		} else if (window.localStorage.getItem('group')==2) {
-		    if (task==2 || task==5 || task==8) 
-		    condition = 's';
-		  else if (task==3 || task==6 || task==9) 
-		    condition = 'b';
-		  else 
-		    condition = 'f';
-		} else if (window.localStorage.getItem('group')==3) {
-		  if (task==3 || task==6 || task==9) 
-		    condition = 's';
-		  else if (task==1 || task==4 || task==7) 
-		    condition = 'b';
-		  else 
-		    condition = 'f';
-		}
+	 //    if (window.localStorage.getItem('group')==1) {
+		
+		// FOR TESTING ONLY!!!! asdf
+		condition = 'c';
+
+		// if (task==1 || task==4 || task==7) 
+		//     condition = 's';
+		//   else if (task==2 || task==5 || task==8) 
+		//     condition = 'b';
+		//   else 
+		//     condition = 'f';
+		// } else if (window.localStorage.getItem('group')==2) {
+		//     if (task==2 || task==5 || task==8) 
+		//     condition = 's';
+		//   else if (task==3 || task==6 || task==9) 
+		//     condition = 'b';
+		//   else 
+		//     condition = 'f';
+		// } else if (window.localStorage.getItem('group')==3) {
+		//   if (task==3 || task==6 || task==9) 
+		//     condition = 's';
+		//   else if (task==1 || task==4 || task==7) 
+		//     condition = 'b';
+		//   else 
+		//     condition = 'f';
+		// }
 	    sendResponse({task:task, taskMsg:taskMsg, condition:condition});
 	}
 
@@ -274,6 +278,27 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 				deleteAllOtherTabs(tab.id);
 			});
 	    }
+	} 
+	else if (request.activateTab) {
+		chrome.tabs.update(request.activateTab, {active:true});
+	}
+	else if (request.closeTab) {
+		chrome.tabs.remove(request.closeTab);
 	}
 
+});
+
+chrome.runtime.onConnect.addListener(function(port) {
+  console.assert(port.name == "getOpenedTab");
+  port.onMessage.addListener(function(msg) {
+  	function newBackgroundTab(tab) {
+		port.postMessage({gotIt: tab.id});
+		chrome.tabs.onCreated.removeListener(newBackgroundTab);
+	}
+    if (msg.openedTab) {
+    	chrome.tabs.onCreated.addListener(newBackgroundTab);
+    } 
+    else if (msg.keepGoing)
+      port.postMessage({notThereYet: true});
+  });
 });

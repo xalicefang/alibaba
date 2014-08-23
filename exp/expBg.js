@@ -29,7 +29,6 @@ function maintainFocus(newWindowId) {
 
 function confirmClose(closedWindowId) {
 	if (closedWindowId==windowId) {
-		///!!!!! ??? for testing only
 		// uninstall();
 	}
 }

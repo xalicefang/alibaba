@@ -26,6 +26,67 @@ function sameTab(event) {
   }
 }
 
+function bringToForeground(tabId) {
+  console.log("foreground" + tabId);
+  chrome.runtime.sendMessage({activateTab: tabId}); 
+}
+
+function closeItem(tabId, picBox, closeBtn,link) {
+  chrome.runtime.sendMessage({closeTab: tabId});
+  picBox.className -= " colorBorder";
+  picBox.removeChild(closeBtn);
+  $(link).bind( "click", colorsLinks );
+}
+
+function colorsLinks(e) {
+  e.preventDefault();
+  var picBox = $(this)[0].parentNode.parentNode.parentNode.parentNode;
+  picBox.className += " colorBorder";
+  var closeBtn = document.createElement('div');
+  closeBtn.innerHTML = "<a>x</a>";
+  closeBtn.className = "closeBtn";
+  picBox.appendChild(closeBtn);
+
+  console.log(picBox);
+
+  var a = $(this)[0].href;
+  var tabId;
+
+  var port = chrome.runtime.connect({name: "getOpenedTab"});
+  port.postMessage({openedTab: true});
+  port.onMessage.addListener(function(msg) {
+    if (msg.gotIt) {
+      tabId = msg.gotIt;
+    } else {
+      port.postMessage({keepGoing: true});
+    }
+  });
+
+  var link = this;
+  $(closeBtn).bind("click",function(e) {
+    e.preventDefault();
+    closeItem(tabId, picBox, closeBtn, link);
+  });
+  
+  var b = document.createElement('a');
+  // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+  b.href = a;
+  var evt = document.createEvent("MouseEvents");
+  evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+  b.dispatchEvent(evt);
+  
+  $(this).unbind( "click", colorsLinks );
+  $(this).bind("click",function(e) {
+    e.preventDefault();
+    bringToForeground(tabId);
+  });
+}
+
+function colorsTab() {
+  $( "a" ).unbind( "click", colorsLinks );
+  $( "a" ).bind( "click", colorsLinks );
+}
+
 function backgroundLinks(e) {
   e.preventDefault();
   var a = $(this)[0].href;
@@ -47,14 +108,21 @@ function backgroundTab() {
 
 if(document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
   chrome.runtime.sendMessage({getTask: true}, function(response) {
-    window.localStorage.setItem('task', response.task);
-    if (response.condition=='s') {
-      console.log("same tab");
-      document.addEventListener('DOMNodeInserted', sameTab);
-    } else if (response.condition=='b') {
-      console.log("background tab");
-      document.addEventListener('DOMNodeInserted', backgroundTab);
-    } 
+    // window.localStorage.setItem('task', response.task);
+    // if (response.condition=='s') {
+    //   console.log("same tab");
+    //   document.addEventListener('DOMNodeInserted', sameTab);
+    // } else if (response.condition=='b') {
+    //   console.log("background tab");
+    //   document.addEventListener('DOMNodeInserted', backgroundTab);
+    // } else if (response.condition=='c') {
+    //   console.log("colors tab");
+    //   document.addEventListener('DOMNodeInserted', colorsTab);
+    // } 
+
+    // for testing!!! asdf
+    document.addEventListener('DOMNodeInserted', colorsTab);
+
     window.localStorage.setItem('taskMsg', response.taskMsg);
     // set if already there
     if ($("#modal")) {

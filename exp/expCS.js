@@ -29,8 +29,8 @@ function submitTask() {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-	// disable right click context menu
-	document.body.setAttribute("oncontextmenu","return false");
+	// disable right click context menu !!!!asdf removed for testing
+	// document.body.setAttribute("oncontextmenu","return false");
 
 	if (document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1 ) {
 		// progress timer

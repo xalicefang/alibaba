@@ -1,3 +1,16 @@
+.colorBorder {
+    border: solid 2px orange !important;
+}
+
+.closeBtn {
+    position:absolute;
+    bottom:-20px;
+    right:-20px;
+    color:orange;
+    font-size:20px;
+    padding:3px;
+}
+
 .expText {
     font-family: Tahoma;
     font-size: 13px;

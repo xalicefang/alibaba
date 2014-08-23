@@ -69,9 +69,8 @@ function makeCSVItems() {
 
 function makeCSVList() {
 	for (var i = 0; i< listTime.length; i++) {
-		csvStringList += listTime[i] + ",";
+		csvStringList += listTime[i] + "\r\n";
 	}
-	csvStringList += "\r\n";
 }
 
 function downloadCSVItems() {
