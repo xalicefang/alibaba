@@ -4,8 +4,8 @@
 
 .closeBtn {
     position:absolute;
-    bottom:-20px;
-    right:-20px;
+    top:0px;
+    right:0px;
     color:orange;
     font-size:20px;
     padding:3px;
@@ -29,7 +29,7 @@
     visibility:hidden;
 }
 
-.header {
+.expHeader {
     width: 100%;
     padding:10px 50px;
     border-bottom: solid 3px orange;
@@ -95,6 +95,18 @@
     display:none;
 }
 
+.smallItemBox {
+    min-height: 300px !important;
+}
+
+.smallItemHoverBox {
+    min-height: 280px !important;
+}
+
+.hideReportBtn {
+    visibility: hidden;
+}
+
 .hoverModal {
     color:orange;
 }
@@ -105,7 +117,7 @@
     padding:40px;
 }
 
-.logo {
+.expLogo {
     height: 35px;
 }
 
@@ -132,6 +144,10 @@
 
 .largeBtn {
     padding:10 100;
+}
+
+.store-promotion {
+    display: none !important;
 }
 
 #J_MUIMallbar, #ald-skuRight {

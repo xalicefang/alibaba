@@ -25,12 +25,12 @@ function storeTime() {
 }
 
 function countPageTime(url) {	
-	if (url.indexOf("s.taobao.com") != -1) {
+	if (url.indexOf("aliexpress.com/category") != -1) {
 		// list
 		storeTime();
 		lastTime = Date.now();
 		lastInfo = {'type':'list'};
-	} else if (url.indexOf("detail.tmall.com") != -1) {
+	} else if (url.indexOf("aliexpress.com/item") != -1) {
 		// detail
 		var id = getParameterFromString(url, 'id');
 		storeTime();

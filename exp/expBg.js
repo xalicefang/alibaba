@@ -7,9 +7,9 @@ chrome.windows.getLastFocused(function(window) {
 	chrome.windows.update(windowId, {state:"maximized"});
 });
 
-chrome.windows.onFocusChanged.addListener(maintainFocus);
-
-chrome.windows.onRemoved.addListener(confirmClose);
+// for testing only!!!!! asdf
+// chrome.windows.onFocusChanged.addListener(maintainFocus);
+// chrome.windows.onRemoved.addListener(confirmClose);
 
 function maintainFocus(newWindowId) {
 	// if not alert
@@ -29,6 +29,12 @@ function maintainFocus(newWindowId) {
 
 function confirmClose(closedWindowId) {
 	if (closedWindowId==windowId) {
-		// uninstall();
+		uninstall();
 	}
+}
+
+function saveListTabId() {
+	chrome.tabs.query({url:"*://www.aliexpress.com/*", currentWindow: true}, function(tabs) {
+		listTabId = tabs[0].id;
+	});
 }

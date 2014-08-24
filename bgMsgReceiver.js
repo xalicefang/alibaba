@@ -13,6 +13,7 @@ var expStartTime;
 var windowId;
 var startTaskTime = 0;
 var condition;
+var listTabId;
 
 function deleteAllOtherTabs(tabId) {
 	chrome.tabs.query({windowId: windowId}, function(tabs) {
@@ -224,6 +225,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	else if (request.firstTimeTask) {
 		sendResponse({taskSeen:taskSeen});
 		if (!taskSeen) {
+			saveListTabId();
 			startTaskTime = request.firstTimeTask;
 			taskSeen = true;
 		}
@@ -248,16 +250,38 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		} else if (sendToUninstall) {
 			uninstall();
 		} else {
-			if (task==0) {
-				var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1";
+			// if (task==0) {
+			// 	var url = "http://s.taobao.com/search?q=%BF%C9%B0%AE%B1%AD%D7%D3%B4%B4%D2%E2%B4%F8%B8%C7&tianmao=1";
+			// } else if (task==1) {
+			// 	var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%BA%AB%B9%FA&tianmao=1"
+	  //   	} else if (task==2) {
+	  //   		var url = "http://s.taobao.com/search?q=%C7%AE%B0%FC%B4%B4%D2%E2+&tianmao=1";
+	  //   	} else if (task==3) {
+	  //   		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1"
+	  //   	} else if (task==4) {
+			// 	var url = "http://s.taobao.com/search?q=%D0%A1%B1%BE%D7%D3%BF%C9%B0%AE&tianmao=1";
+	  //   	} else if (task==5) {
+	  //   		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%B0%FC%D3%CA+%BF%C9%B0%AE+%D1%A7%C9%FA&tianmao=1";
+	  //   	} else if (task==6) {
+	  //   		var url = "http://s.taobao.com/search?q=%D0%A1%B1%BE%D7%D3%BF%C9%B0%AE&tianmao=1";
+	  //   	} else if (task==7) {
+	  //   		var url = "http://s.taobao.com/search?q=ipad%BF%C7&tianmao=1&filter=reserve_price[0.0,21]#J_relative";
+	  //   	} else if (task==8) {
+			// 	var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1";
+	  //   	} else if (task==9) {
+	  //   		var url = "http://s.taobao.com/search?q=%D4%B2%D6%E9%B1%CA%BF%C9%B0%AE&tianmao=1";
+	  //   	} 
+
+	  		if (task==0) {
+				var url = "http://www.aliexpress.com/wholesale?SearchText=slippers";
 			} else if (task==1) {
-				var url = "http://s.taobao.com/search?q=%D3%EA%C9%A1%BA%AB%B9%FA&tianmao=1"
+				var url = "http://www.aliexpress.com/category/152405/wallets.html"
 	    	} else if (task==2) {
-	    		var url = "http://s.taobao.com/search?q=%C7%AE%B0%FC%B4%B4%D2%E2+&tianmao=1";
+	    		var url = "http://www.aliexpress.com/category/40601/bedding-sets.html?site=glo&g=y&shipCountry=us&pvId=326-97&isrefine=y";
 	    	} else if (task==3) {
-	    		var url = "http://s.taobao.com/search?q=%CD%CF%D0%AC%B4%B4%D2%E2+&tianmao=1"
+	    		var url = "http://www.aliexpress.com/w/wholesale-solid-color-t-shirt.html?g=y&SearchText=solid%2Bcolor%2Bt%2Bshirt&CatId=100003071&pvId=200000457-200003574&shipCountry=us&isrefine=y"
 	    	} else if (task==4) {
-				var url = "http://s.taobao.com/search?q=%D0%A1%B1%BE%D7%D3%BF%C9%B0%AE&tianmao=1";
+				var url = "http://www.aliexpress.com/w/wholesale-bath-towel.html?g=y&SearchText=bath%2Btowel&CatId=0&shipCountry=us";
 	    	} else if (task==5) {
 	    		var url = "http://s.taobao.com/search?q=%CF%F0%C6%A4%B0%FC%D3%CA+%BF%C9%B0%AE+%D1%A7%C9%FA&tianmao=1";
 	    	} else if (task==6) {
@@ -268,7 +292,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 				var url = "http://s.taobao.com/search?q=%B6%FA%BB%FA%BC%AF%CF%DF&tianmao=1";
 	    	} else if (task==9) {
 	    		var url = "http://s.taobao.com/search?q=%D4%B2%D6%E9%B1%CA%BF%C9%B0%AE&tianmao=1";
-	    	} else {
+	    	} 
+	    	else {
 	    		postSurvey();
 	    	}
 	    	task++;
@@ -289,16 +314,39 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 });
 
 chrome.runtime.onConnect.addListener(function(port) {
-  console.assert(port.name == "getOpenedTab");
-  port.onMessage.addListener(function(msg) {
-  	function newBackgroundTab(tab) {
-		port.postMessage({gotIt: tab.id});
-		chrome.tabs.onCreated.removeListener(newBackgroundTab);
-	}
-    if (msg.openedTab) {
-    	chrome.tabs.onCreated.addListener(newBackgroundTab);
-    } 
-    else if (msg.keepGoing)
-      port.postMessage({notThereYet: true});
-  });
+	console.assert(port.name == "getOpenedTab");
+	port.onMessage.addListener(function(msg) {
+	  	function newBackgroundTab(tab) {
+	  		console.log(tab.url);
+			port.postMessage({gotIt: tab.id});
+			chrome.tabs.onCreated.removeListener(newBackgroundTab);
+		}
+	    if (msg.openedTab) {
+	    	chrome.tabs.onCreated.addListener(newBackgroundTab);
+	    } 
+	    else if (msg.keepGoing)
+	    	port.postMessage({notThereYet: true});
+	});
 });
+
+// chrome.runtime.onConnect.addListener(function(port) {
+// 	console.assert(port.name == "getOpenedTab");
+// 	port.onMessage.addListener(function(msg) {
+// 		var tabUrl;
+// 	  	function newBackgroundTab(tab) {
+// 	  		console.log("new tab found: " + tab.url);
+// 	  		console.log("new tab id: " + tab.id);
+// 	  		if (tab.url == tabUrl) {
+// 				port.postMessage({gotIt: tab.id});
+// 				chrome.tabs.onCreated.removeListener(newBackgroundTab);
+// 			}
+// 		}
+// 	    if (msg.openedTab) {
+// 	    	tabUrl = msg.openedTab;
+// 	    	console.log("opened port finding tab with this url: " + tabUrl);
+// 	    	chrome.tabs.onCreated.addListener(newBackgroundTab);
+// 	    } 
+// 	    else if (msg.keepGoing)
+// 	    	port.postMessage({notThereYet: true});
+// 	});
+// });

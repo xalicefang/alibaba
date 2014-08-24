@@ -32,9 +32,9 @@ function activated(activeInfo) {
   });
 }
 
-function removed(tabId, removeInfo) {
+function removed(tabId) {
   // can't get tab info here because already removed
-  makeRow("removed",tabId,removeInfo.isWindowClosing);
+  makeRow("removed",tabId);
 }
 
 function makeRow() {

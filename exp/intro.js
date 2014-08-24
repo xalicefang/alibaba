@@ -1,16 +1,3 @@
-// if (window.localStorage.getItem('task')) {
-//     alert("You have already started this experiment. Redirecting to where you left off...");
-//     // set timer
-//     var seconds = new Date().getTime() / 1000;
-//     var totalTime = 720;
-//     //var totalTime = 60;
-//     window.localStorage.setItem('stopTime',seconds+totalTime); 
-//     var a = document.createElement('a');
-//     a.href     = "http://www.taobao.com/?task=" + window.localStorage.getItem('task');
-//     a.target   = '_self';
-//     a.click();
-// }
-
 $.post('http://stanford.edu/~fangx/cgi-bin/alibaba/countTotal.php', null, function(total) {
     if (total > 90) {
         var expired = document.createElement('a');

@@ -26,60 +26,80 @@ function sameTab(event) {
   }
 }
 
-function bringToForeground(tabId) {
-  console.log("foreground" + tabId);
-  chrome.runtime.sendMessage({activateTab: tabId}); 
-}
+var colorsForeground;
 
-function closeItem(tabId, picBox, closeBtn,link) {
-  chrome.runtime.sendMessage({closeTab: tabId});
-  picBox.className -= " colorBorder";
-  picBox.removeChild(closeBtn);
-  $(link).bind( "click", colorsLinks );
+function deactivateItemBox(closedTabId) {
+  var allElements = document.getElementsByTagName('*');
+  for (var i = 0, n = allElements.length; i < n; i++) {
+    if (allElements[i].getAttribute("tabId") == closedTabId) {
+      allElements[i].className = "item smallItemHoverBox";
+      allElements[i].removeAttribute('tabId');
+      var closeBtn = allElements[i].getElementsByClassName("closeBtn")[0];
+      if (closeBtn)
+        allElements[i].removeChild(closeBtn);
+      // get link
+      link = allElements[i].childNodes[1].childNodes[1].childNodes[1];
+
+      $(link).unbind( "click", colorsForeground );
+      $(link).bind( "click", colorsLinks );
+      return;
+    }
+  }
 }
 
 function colorsLinks(e) {
   e.preventDefault();
-  var picBox = $(this)[0].parentNode.parentNode.parentNode.parentNode;
-  picBox.className += " colorBorder";
-  var closeBtn = document.createElement('div');
-  closeBtn.innerHTML = "<a>x</a>";
-  closeBtn.className = "closeBtn";
-  picBox.appendChild(closeBtn);
-
-  console.log(picBox);
-
   var a = $(this)[0].href;
-  var tabId;
 
-  var port = chrome.runtime.connect({name: "getOpenedTab"});
-  port.postMessage({openedTab: true});
-  port.onMessage.addListener(function(msg) {
-    if (msg.gotIt) {
-      tabId = msg.gotIt;
-    } else {
-      port.postMessage({keepGoing: true});
+  var picBox = $(this)[0].parentNode.parentNode.parentNode;
+
+  // exclude # links and hack - else, the first item pops up twice - still bug!!! ARGHHHHH
+  if (a.indexOf('#', a.length - 1) === -1 && !picBox.getAttribute('tabId')) {
+
+    if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/wholesale") != -1) {
+      picBox.className += " colorBorder";
+      var closeBtn = document.createElement('div');
+      closeBtn.innerHTML = "<a href='#'>x</a>";
+      closeBtn.className = "closeBtn";
+      picBox.appendChild(closeBtn);
+
+      var tabId;
+
+      var port = chrome.runtime.connect({name: "getOpenedTab"});
+      port.postMessage({openedTab: true});
+      port.onMessage.addListener(function(msg) {
+        if (msg.gotIt) {
+          tabId = msg.gotIt;
+          console.log(tabId);
+          picBox.setAttribute('tabId',tabId);
+        } else {
+          port.postMessage({keepGoing: true});
+        }
+      });
+
+      $(closeBtn).bind("click",function(e) {
+        e.preventDefault();
+        chrome.runtime.sendMessage({closeTab: tabId});
+      });
+
+      console.log(this);
+     
+      $(this).unbind( "click", colorsLinks );
+      $(this).bind("click", colorsForeground = function(e) {
+        e.preventDefault();
+        console.log("foreground" + tabId);
+        chrome.runtime.sendMessage({activateTab: tabId}); 
+      });
     }
-  });
 
-  var link = this;
-  $(closeBtn).bind("click",function(e) {
-    e.preventDefault();
-    closeItem(tabId, picBox, closeBtn, link);
-  });
-  
-  var b = document.createElement('a');
-  // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
-  b.href = a;
-  var evt = document.createEvent("MouseEvents");
-  evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
-  b.dispatchEvent(evt);
-  
-  $(this).unbind( "click", colorsLinks );
-  $(this).bind("click",function(e) {
-    e.preventDefault();
-    bringToForeground(tabId);
-  });
+    var b = document.createElement('a');
+    // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+    b.href = a;
+    var evt = document.createEvent("MouseEvents");
+    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+    b.dispatchEvent(evt);
+  }
+
 }
 
 function colorsTab() {
@@ -90,7 +110,7 @@ function colorsTab() {
 function backgroundLinks(e) {
   e.preventDefault();
   var a = $(this)[0].href;
-  // exclude the expand/ min link
+  // exclude # links
   if (a.indexOf('#', a.length - 1) === -1) {
     var b = document.createElement('a');
     // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
@@ -106,7 +126,8 @@ function backgroundTab() {
   $( "a" ).bind( "click", backgroundLinks );
 }
 
-if(document.URL.indexOf("s.taobao.com") != -1 || document.URL.indexOf("detail.tmall.com") != -1) {
+if(document.URL.indexOf("aliexpress.com") != -1) {
+  
   chrome.runtime.sendMessage({getTask: true}, function(response) {
     // window.localStorage.setItem('task', response.task);
     // if (response.condition=='s') {
@@ -140,6 +161,11 @@ chrome.runtime.onMessage.addListener(
     if (request.get == "readyState") {
       sendResponse({readyState: document.readyState});
   	} 
+
+    else if (request.closedTab) {
+      console.log("closed tab request received");
+      deactivateItemBox(request.closedTab);
+    }
   });
 
 // deactivate ctrl-click
