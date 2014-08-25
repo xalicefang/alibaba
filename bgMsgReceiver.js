@@ -57,7 +57,6 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		chrome.tabs.create({windowId:windowId, url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_7WJUmQZX9y75GMB&userID=" + window.localStorage.getItem('userID')}, function(tab) {
 			deleteAllOtherTabs(tab.id);
 		});
-		// chrome.tabs.update(sender.tab.id, {url: "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Rv5tKvvWNtVz7f"});
 	}
 
     // if active tab dom loaded
@@ -182,6 +181,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		    url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_6Aue1omKsDzY8DP";
 		else if (condition=='b')
 		    url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_etImcqJ4datp1K5";
+		else if (condition=='c')
+		    url = "https://stanforduniversity.qualtrics.com/SE/?SID=SV_9EqBN8483xUVACp";
 
 	   	var urlParameters = "&task=" + task + "&userID=" + window.localStorage.getItem('userID') + '&group=' + window.localStorage.getItem('group') + '&condition=' + condition; 
 
@@ -192,21 +193,6 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		downloadCSVItems();
 		downloadCSVLoading();
 		downloadCSV();
-
-		// function submitTask() {
-		// 	$.post('http://stanford.edu/~fangx/cgi-bin/alibaba/taskSubmit.php?number='+window.localStorage.getItem('task'), formData, function(response) {
-		// 		//alert(response);
-		// 	});
-		// 	// save time of submit
-		// 	window.localStorage.setItem('lastTime', currTime); 
-
-		// 	// call save csv files, open new window for new task
-		// 	chrome.runtime.sendMessage({finishedTask: window.localStorage.getItem('task')}, function(response) {
-		// 	    if (response.finished) {
-		// 	    	window.localStorage.setItem('finished', true);
-		// 	    }   
-		// 	});
-		// }
 	} 
 
 	// send userID to content page
@@ -319,6 +305,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 	  	function newBackgroundTab(tab) {
 	  		console.log(tab.url);
 			port.postMessage({gotIt: tab.id});
+			chrome.tabs.highlight({tabs:[0,tab.index],windowId:windowId}, function(){});
 			chrome.tabs.onCreated.removeListener(newBackgroundTab);
 		}
 	    if (msg.openedTab) {

@@ -146,7 +146,7 @@
     padding:10 100;
 }
 
-.store-promotion {
+.store-promotion, .discount-flag, #go-top {
     display: none !important;
 }
 

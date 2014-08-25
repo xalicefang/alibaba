@@ -5,7 +5,7 @@ if (document.URL.indexOf("finished.html") == -1 && window.localStorage.getItem('
 }
 
 if (!window.localStorage.getItem('started')) {
-	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/wholesale") != -1) {
+	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
 		var expStartTime = Date.now();
 		window.localStorage.setItem('expStartTime',expStartTime); 
 		window.localStorage.setItem('started',true);
@@ -66,21 +66,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 	// clean taobao search listings page
-	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/wholesale") != -1) {
-		var keep = $("#main-wrap")[0];
+	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
+		var mainWrap = $("#main-wrap")[0];
 		while (document.body.firstChild) {
 		    document.body.removeChild(document.body.firstChild);
 		}
-		document.body.appendChild(keep);
-		var keep2 = $("#hs-list-items")[0];
-		var keep3 = $("#hs-below-list-items")[0];
-		while (keep.firstChild) {
-		    keep.removeChild(keep.firstChild);
+		document.body.appendChild(mainWrap);
+		if (document.URL.indexOf("aliexpress.com/category") != -1) {
+			var keep2 = $("#list-items")[0];
+			while (mainWrap.firstChild) {
+			    mainWrap.removeChild(mainWrap.firstChild);
+			}
+			mainWrap.appendChild(keep2);
+		} else if ( document.URL.indexOf("aliexpress.com/w") != -1) {
+			var keep2 = $("#hs-list-items")[0];
+			var keep3 = $("#hs-below-list-items")[0];
+			while (mainWrap.firstChild) {
+			    mainWrap.removeChild(mainWrap.firstChild);
+			}
+			mainWrap.appendChild(keep2);
+			mainWrap.appendChild(keep3);
 		}
-		keep.appendChild(keep2);
-		keep.appendChild(keep3);
-		keep.style.margin = "80px 0 0 50px";
-		keep.style.width = "950px";
+		mainWrap.style.margin = "80px 0 0 50px";
+		mainWrap.style.width = "950px";
 
 		//delete stuff from item boxes
 		var allItemBoxes = document.getElementsByClassName("item");
@@ -89,6 +97,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			var price = $(".price")[0];
 			item.removeChild($(".info-more")[0]);
 			item.className+=" smallItemHoverBox";
+		}
+
+		//change price
+		var price = $(".price");
+		for (var i = 0; i < price.length; i++) {
+			var usPrice = price[i].childNodes[1].textContent;
+			usPrice = usPrice.substring(usPrice.indexOf('$')+1);
+
+			while (price[i].childNodes[0]) 
+				price[i].removeChild(price[i].childNodes[0]);
+
+			var chinesePrice = document.createElement('em');
+			chinesePrice.innerHTML = "RMB ¥" + (parseFloat(usPrice)*6).toFixed(2);
+			chinesePrice.className = "value";
+			price[i].appendChild(chinesePrice);
 		}
 
 		var infoBoxes = document.getElementsByClassName("info");
@@ -148,6 +171,64 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		while(photoChildren[2]) {
 			photoCol.removeChild(photoChildren[2]);
 		}
+
+		// translate ratings
+		if ($(".product-star")[0]) {
+			var text = $(".product-star")[0].childNodes[4].textContent;
+			var startSubstr = text.indexOf('(')+1;
+			var endSubstr = text.indexOf(' v');
+			var numVotes = text.substring(startSubstr,endSubstr);
+			var rating = document.createElement("span");
+			rating.innerHTML = " 买家喜欢这个产品！ (" + numVotes + " 计票)";
+			// remove english
+			$(".product-star")[0].removeChild($(".product-star")[0].childNodes[4]);
+			$(".product-star")[0].appendChild(rating);
+		}
+
+		// translate orders
+		if ($(".orders-count")[0]) {
+			$(".orders-count")[0].removeChild($(".orders-count")[0].childNodes[2]);
+			var orders = document.createElement("span");
+			orders.innerHTML = " 订单";
+			$(".orders-count")[0].appendChild(orders);
+		}
+
+		// translate price
+		if ($(".product-info-current")[0]) 
+			$(".product-info-current")[0].childNodes[1].innerHTML = "价格：";
+
+		//translate color
+		if ($(".sku-color-title")[0])
+			$(".sku-color-title")[0].innerHTML = "颜色：";
+		//translate size
+		if ($(".sku-title")[0])
+			$(".sku-title")[0].innerHTML = "大小："
+		// remove quantity
+		$(".product-info-operation")[0].removeChild($("#product-info-quantity")[0]);
+
+		// remove everything besides price
+		if ($("#sku-discount-price")[0])
+			var price = $("#sku-discount-price")[0].textContent;
+		else if ($("#sku-price")[0])
+			var price = $("#sku-price")[0].textContent;
+		while($(".current-price")[0].childNodes[0]) {
+			$(".current-price")[0].removeChild($(".current-price")[0].childNodes[0]);
+		}
+		var priceSpan = document.createElement('span');
+		priceSpan.innerHTML = "<b>RMB ¥" + (parseFloat(price)*6).toFixed(2)+ "</b>";
+		$(".current-price")[0].appendChild(priceSpan);
+		//$(".current-price")[0].removeChild($(".time-left")[0]);
+
+		// remove on mouse over
+		$("#img")[0].removeChild($(".img-zoom-in")[0]);
+		console.log(document.getElementsByClassName("ui-magnifier-glass")[0]);
+		console.log(document.getElementsByClassName("ui-image-viewer-thumb-frame")[0]);
+		// $(".ui-magnifier-glass")[0].setAttribute("href","#");
+		$(".ui-image-viewer-thumb-frame")[0].setAttribute("href","#");
+
+		// remove prediscount price
+		if ($(".product-info-original")[0])
+			$("#product-info-price-pnl")[0].removeChild($(".product-info-original")[0]);
 
 		// remove shipping
 		$(".product-info-operation")[0].removeChild($(".product-info-shipping")[0]);
@@ -214,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	modal.setAttribute('id','modal');
 	document.body.appendChild(modal);
 
-	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/wholesale") != -1) {
+	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
 		chrome.runtime.sendMessage({firstTimeTask:Date.now()}, function(response) {
 			if (!response.taskSeen) {
 				modal.style.visibility = "visible";

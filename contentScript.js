@@ -56,7 +56,7 @@ function colorsLinks(e) {
   // exclude # links and hack - else, the first item pops up twice - still bug!!! ARGHHHHH
   if (a.indexOf('#', a.length - 1) === -1 && !picBox.getAttribute('tabId')) {
 
-    if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/wholesale") != -1) {
+    if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
       picBox.className += " colorBorder";
       var closeBtn = document.createElement('div');
       closeBtn.innerHTML = "<a href='#'>x</a>";
@@ -129,20 +129,17 @@ function backgroundTab() {
 if(document.URL.indexOf("aliexpress.com") != -1) {
   
   chrome.runtime.sendMessage({getTask: true}, function(response) {
-    // window.localStorage.setItem('task', response.task);
-    // if (response.condition=='s') {
-    //   console.log("same tab");
-    //   document.addEventListener('DOMNodeInserted', sameTab);
-    // } else if (response.condition=='b') {
-    //   console.log("background tab");
-    //   document.addEventListener('DOMNodeInserted', backgroundTab);
-    // } else if (response.condition=='c') {
-    //   console.log("colors tab");
-    //   document.addEventListener('DOMNodeInserted', colorsTab);
-    // } 
-
-    // for testing!!! asdf
-    document.addEventListener('DOMNodeInserted', colorsTab);
+    window.localStorage.setItem('task', response.task);
+    if (response.condition=='s') {
+      console.log("same tab");
+      document.addEventListener('DOMNodeInserted', sameTab);
+    } else if (response.condition=='b') {
+      console.log("background tab");
+      document.addEventListener('DOMNodeInserted', backgroundTab);
+    } else if (response.condition=='c') {
+      console.log("colors tab");
+      document.addEventListener('DOMNodeInserted', colorsTab);
+    } 
 
     window.localStorage.setItem('taskMsg', response.taskMsg);
     // set if already there
