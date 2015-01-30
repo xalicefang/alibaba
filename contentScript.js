@@ -2,6 +2,13 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
+// set up selected tabs warehouse
+var page = getURLParameter('page');
+if (!page) page = 1;
+var selectedTabs = {};
+window.localStorage.setItem('selectedTabs', selectedTabs);
+
+
 // set every page. - local storage doesn't persist between domains!
 chrome.runtime.sendMessage({getEssentials: true}, function(response) {
   //alert("response " + response.user);
@@ -9,24 +16,34 @@ chrome.runtime.sendMessage({getEssentials: true}, function(response) {
   window.localStorage.setItem('group', response.group);
 });
 
-function sameTab(event) {
+// function sameTab(event) {
+//   // there's repeats with related node, but it covers everything
+//   var a = event.relatedNode.getElementsByTagName('a');
+//   for (i=0; i<a.length; i++) { 
+//     if (a[i].target=="_blank") { 
+//       a[i].target="_self";
+//     }
+//   } 
+
+//   var b = event.relatedNode.getElementsByTagName('base'); 
+//   for (i=0;i<b.length;i++) { 
+//     if (b[i].target=="_blank") { 
+//         b[i].target="_self";
+//     }                 
+//   }
+// }
+
+function foregroundTab(event) {
   // there's repeats with related node, but it covers everything
   var a = event.relatedNode.getElementsByTagName('a');
   for (i=0; i<a.length; i++) { 
-    if (a[i].target=="_blank") { 
-      a[i].target="_self";
-    }
+      if (a[i].href.indexOf('page') == -1)
+        a[i].target="_blank";
   } 
-
-  var b = event.relatedNode.getElementsByTagName('base'); 
-  for (i=0;i<b.length;i++) { 
-    if (b[i].target=="_blank") { 
-        b[i].target="_self";
-    }                 
-  }
 }
 
 var colorsForeground;
+var highlightTab;
 
 function deactivateItemBox(closedTabId) {
   var allElements = document.getElementsByTagName('*');
@@ -34,13 +51,11 @@ function deactivateItemBox(closedTabId) {
     if (allElements[i].getAttribute("tabId") == closedTabId) {
       allElements[i].className = "item smallItemHoverBox";
       allElements[i].removeAttribute('tabId');
-      var closeBtn = allElements[i].getElementsByClassName("closeBtn")[0];
-      if (closeBtn)
-        allElements[i].removeChild(closeBtn);
       // get link
       link = allElements[i].childNodes[1].childNodes[1].childNodes[1];
 
       $(link).unbind( "click", colorsForeground );
+      $(this).unbind( "mouseover", highlightTab);
       $(link).bind( "click", colorsLinks );
       return;
     }
@@ -48,58 +63,54 @@ function deactivateItemBox(closedTabId) {
 }
 
 function colorsLinks(e) {
-  e.preventDefault();
-  var a = $(this)[0].href;
+  if ( $(this)[0].href.indexOf('page') == -1 ) {
+    e.preventDefault();
+    var a = $(this)[0].href;
 
-  var picBox = $(this)[0].parentNode.parentNode.parentNode;
+    var picBox = $(this)[0].parentNode.parentNode.parentNode;
 
-  // exclude # links and hack - else, the first item pops up twice - still bug!!! ARGHHHHH
-  if (a.indexOf('#', a.length - 1) === -1 && !picBox.getAttribute('tabId')) {
+    // exclude # links and hack - else, the first item pops up twice - still bug!!! ARGHHHHH
+    if (a.indexOf('#', a.length - 1) === -1 && !picBox.getAttribute('tabId')) {
 
-    if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
-      picBox.className += " colorBorder";
-      var closeBtn = document.createElement('div');
-      closeBtn.innerHTML = "<a href='#'>x</a>";
-      closeBtn.className = "closeBtn";
-      picBox.appendChild(closeBtn);
+      if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
+        picBox.className += " colorBorder";
 
-      var tabId;
+        var tabId;
 
-      var port = chrome.runtime.connect({name: "getOpenedTab"});
-      port.postMessage({openedTab: true});
-      port.onMessage.addListener(function(msg) {
-        if (msg.gotIt) {
-          tabId = msg.gotIt;
-          console.log(tabId);
-          picBox.setAttribute('tabId',tabId);
-        } else {
-          port.postMessage({keepGoing: true});
-        }
-      });
+        var port = chrome.runtime.connect({name: "getOpenedTab"});
+        port.postMessage({openedTab: true});
+        port.onMessage.addListener(function(msg) {
+          if (msg.gotIt) {
+            tabId = msg.gotIt;
+            console.log(tabId);
+            picBox.setAttribute('tabId',tabId);
 
-      $(closeBtn).bind("click",function(e) {
-        e.preventDefault();
-        chrome.runtime.sendMessage({closeTab: tabId});
-      });
+          } else {
+            port.postMessage({keepGoing: true});
+          }
+        });
+       
+        $(this).unbind( "click", colorsLinks );
 
-      console.log(this);
-     
-      $(this).unbind( "click", colorsLinks );
-      $(this).bind("click", colorsForeground = function(e) {
-        e.preventDefault();
-        console.log("foreground" + tabId);
-        chrome.runtime.sendMessage({activateTab: tabId}); 
-      });
+        $(this).bind( "mouseover", highlightTab = function(e) {
+          chrome.runtime.sendMessage({highlightTab: tabId});
+        });
+        
+        $(this).bind("click", colorsForeground = function(e) {
+          e.preventDefault();
+          console.log("foreground" + tabId);
+          chrome.runtime.sendMessage({activateTab: tabId}); 
+        });
+      }
+
+      var b = document.createElement('a');
+      // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
+      b.href = a;
+      var evt = document.createEvent("MouseEvents");
+      evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+      b.dispatchEvent(evt);
     }
-
-    var b = document.createElement('a');
-    // copy original link over - need to have a separate element to dispatch event on or else will go into infinite loop of clicks
-    b.href = a;
-    var evt = document.createEvent("MouseEvents");
-    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
-    b.dispatchEvent(evt);
   }
-
 }
 
 function colorsTab() {
@@ -126,20 +137,41 @@ function backgroundTab() {
   $( "a" ).bind( "click", backgroundLinks );
 }
 
+function tabLinks(e) {
+  e.preventDefault();
+  var a = $(this)[0].href;
+  $.get( a, function( data ) {
+    var detailTab = document.createElement('div');
+    detailTab.className = "detailTab";
+    detailTab.setAttribute('id',a);
+    detailTab.innerHTML = data;
+    document.body.appendChild(detailTab);
+  });
+
+}
+
+function listPageTab() {
+  $( "a" ).unbind( "click", tabLinks );
+  $( "a" ).bind( "click", tabLinks );
+}
+
 if(document.URL.indexOf("aliexpress.com") != -1) {
   
   chrome.runtime.sendMessage({getTask: true}, function(response) {
     window.localStorage.setItem('task', response.task);
+    window.localStorage.setItem('condition', response.condition);
     if (response.condition=='s') {
       console.log("same tab");
-      document.addEventListener('DOMNodeInserted', sameTab);
-    } else if (response.condition=='b') {
-      console.log("background tab");
-      document.addEventListener('DOMNodeInserted', backgroundTab);
     } else if (response.condition=='c') {
       console.log("colors tab");
       document.addEventListener('DOMNodeInserted', colorsTab);
-    } 
+    } else if (response.condition=='f') {
+      console.log("foreground tab");
+      document.addEventListener('DOMNodeInserted', foregroundTab);
+    } else if (response.condition=='d') {
+      console.log("same page tab thing");
+      document.addEventListener('DOMNodeInserted', listPageTab);
+    }
 
     window.localStorage.setItem('taskMsg', response.taskMsg);
     // set if already there
@@ -152,6 +184,15 @@ if(document.URL.indexOf("aliexpress.com") != -1) {
 if (document.URL.indexOf("stanford.edu/~fangx/cgi-bin/alibaba/redirect.html") != -1) {
   chrome.runtime.sendMessage({redirect: true});
 }
+
+// for infinite scroll
+// var pageNum = 1;
+// if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
+  // $.get( document.URL + "&page=" + ++pageNum, function( data ) {
+  //   console.log(data);
+  //   alert( "Load was performed." );
+  // });
+// }
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -195,41 +236,3 @@ document.onreadystatechange = function () {
 window.onbeforeunload = function() {
   chrome.runtime.sendMessage({unload: true});
 };
-
-// if (window.localStorage.getItem('task')==1) {
-//    console.log("same tab");
-//     document.addEventListener('DOMNodeInserted', sameTab);
-// }
-// if (window.localStorage.getItem('condition')==1) {
-//   console.log("condition 1");
-//   if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')== 5 || window.localStorage.getItem('task')==8) {
-//     console.log("same tab");
-//     document.addEventListener('DOMNodeInserted', sameTab);
-//   } else if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')==6 || window.localStorage.getItem('task')==9) {
-//     console.log("background tab")
-//     document.addEventListener('DOMNodeInserted', backgroundTab);
-//   } 
-// } else if (window.localStorage.getItem('condition')==2) {
-//   console.log("condition 2");
-//   if (window.localStorage.getItem('task')==3 || window.localStorage.getItem('task')== 6 || window.localStorage.getItem('task')==9) {
-//     console.log("same tab");
-//     document.addEventListener('DOMNodeInserted', sameTab);
-//   } else if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')==7 || window.localStorage.getItem('task')==10) {
-//     console.log("background tab")
-//     document.addEventListener('DOMNodeInserted', backgroundTab);
-//   } 
-// } else {
-//   console.log("condition 3");
-//   if (window.localStorage.getItem('task')==4 || window.localStorage.getItem('task')== 7 || window.localStorage.getItem('task')==10) {
-//     console.log("same tab");
-//     document.addEventListener('DOMNodeInserted', sameTab);
-//   } else if (window.localStorage.getItem('task')==2 || window.localStorage.getItem('task')==5 || window.localStorage.getItem('task')==8) {
-//     console.log("background tab")
-//     document.addEventListener('DOMNodeInserted', backgroundTab);
-//   } 
-// }
-
-// $.get( "http://detail.tmall.com/item.htm?spm=a230r.1.14.3.noSSs1&id=38548416168&ad_id=&am_id=&cm_id=140105335569ed55e27b&pm_id=", function( data ) {
-//   console.log(data);
-//   alert( "Load was performed." );
-// });

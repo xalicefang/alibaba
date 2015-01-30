@@ -125,8 +125,18 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	 //    if (window.localStorage.getItem('group')==1) {
 		
 		// FOR TESTING ONLY!!!! asdf
-		condition = 'c';
+		condition = 'd';
+		// if (task==1) 
+		//     condition = 's';
+		// else if (task==2) 
+		// 	condition = 'b';
+		// else if (task==3) 
+		// 	condition = 'c';
+		// else 
+		// 	condition = 'f';
+		
 
+		//    if (window.localStorage.getItem('group')==1) {
 		// if (task==1 || task==4 || task==7) 
 		//     condition = 's';
 		//   else if (task==2 || task==5 || task==8) 
@@ -295,6 +305,26 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 	}
 	else if (request.closeTab) {
 		chrome.tabs.remove(request.closeTab);
+	}
+	else if (request.highlightTab) {
+		chrome.tabs.get(request.highlightTab,function(tab){
+			chrome.tabs.highlight({tabs:[0,tab.index],windowId:windowId}, function(){});
+		});
+	}
+	else if (request.removeHighlight) {
+		chrome.tabs.highlight({tabs:0,windowId:windowId}, function(){});
+	}
+
+	else if (request.flipTab) {
+		if (request.flipTab == 'left') {
+			if (sender.tab.index-1 >= 0)
+				chrome.tabs.highlight({tabs:sender.tab.index-1,windowId:windowId}, function(){});
+		} else {
+			chrome.tabs.getAllInWindow(function(tabs) {
+				if (sender.tab.index+1 < tabs.length) 
+					chrome.tabs.highlight({tabs:sender.tab.index+1,windowId:windowId}, function(){});
+			});
+		} 
 	}
 
 });

@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}, 1000);
 	}
 
-
 	// clean taobao search listings page
 	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
 		var mainWrap = $("#main-wrap")[0];
@@ -72,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		    document.body.removeChild(document.body.firstChild);
 		}
 		document.body.appendChild(mainWrap);
+		var bottomPag = $("#pagination-bottom")[0];
 		if (document.URL.indexOf("aliexpress.com/category") != -1) {
 			var keep2 = $("#list-items")[0];
 			while (mainWrap.firstChild) {
@@ -87,7 +87,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			mainWrap.appendChild(keep2);
 			mainWrap.appendChild(keep3);
 		}
-		mainWrap.style.margin = "80px 0 0 50px";
+		mainWrap.appendChild(bottomPag);
+		mainWrap.style.margin = "80px 0 50px 50px";
 		mainWrap.style.width = "950px";
 
 		//delete stuff from item boxes
@@ -256,6 +257,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	}
 
+	if (window.localStorage.getItem('condition')=='d') {
+		var bottomBar = document.createElement('div');
+		bottomBar.className = 'bottomTabsBar';
+		document.body.appendChild(bottomBar);
+		$(bottomBar).click(function() {
+			console.log("clicked");
+			while($(".detailTab")[0]) {
+				document.body.removeChild($(".detailTab")[0]);
+			}
+		});
+	}
+
 	var shade = document.createElement('div');
 	shade.className = 'shade';
 
@@ -322,5 +335,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			submitTask();
 		};
 	}
+	
+	if (window.localStorage.getItem('condition')=='c') {
+	  $(".item").bind( "mouseover", function() {
+	    if (!this.getAttribute("tabId"))
+	      chrome.runtime.sendMessage({removeHighlight: true});
+	  });
+	}
+
+
+	// if (window.localStorage.getItem('condition')=='c') {
+	// 	if (document.URL.indexOf("aliexpress.com/item") != -1) {
+	// 		var leftBar = document.createElement('div');
+	// 		leftBar.className = "leftBar";
+	// 		leftBar.innerHTML = "<";
+	// 		document.body.appendChild(leftBar);
+	// 		$(leftBar).click(function(){
+	// 			chrome.runtime.sendMessage({flipTab:'left'});
+	// 		});
+	// 	}
+	// 	var rightBar = document.createElement('div');
+	// 	rightBar.className = "rightBar";
+	// 	rightBar.innerHTML = ">";
+	// 	document.body.appendChild(rightBar);
+	// 	$(rightBar).click(function(){
+	// 		chrome.runtime.sendMessage({flipTab:'right'});
+	// 	});
+	// }
 	
 });

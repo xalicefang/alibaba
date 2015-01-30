@@ -1,5 +1,7 @@
 chrome.windows.create({
-    url: 'exp/intro.html'
+    //url: 'exp/intro.html'
+    // asdf for testing only!!!!???
+    url: 'http://stanford.edu/~fangx/cgi-bin/alibaba/redirect.html'
 });
 
 chrome.windows.getLastFocused(function(window) {
