@@ -1,16 +1,32 @@
+/****** EXPERIMENT LOGISTICS & BACKBONE background page******/
+
+/* 
+on extension load, open the introduction page! 
+*/
 chrome.windows.create({
     url: 'exp/intro.html'
 });
 
+/* 
+get and store the experiment window id, in anticipation of error cases below 
+*/
 chrome.windows.getLastFocused(function(window) {
 	windowId = window.id;
 	chrome.windows.update(windowId, {state:"maximized"});
 });
 
-// for testing only!!!!! asdf
-// chrome.windows.onFocusChanged.addListener(maintainFocus);
-// chrome.windows.onRemoved.addListener(confirmClose);
 
+/* 
+WHAT TO DO IF USER CHANGES FOCUSED WINDOW OR CLOSES EXPERIMENT WINDOW
+Listen for changing window and closing experiment window
+*/
+chrome.windows.onFocusChanged.addListener(maintainFocus);
+chrome.windows.onRemoved.addListener(confirmClose);
+
+/* 
+Called when user changes window. 
+Brings back experiment window and gives alert.
+*/
 function maintainFocus(newWindowId) {
 	// if not alert
 	if (newWindowId != -1) {
@@ -27,12 +43,19 @@ function maintainFocus(newWindowId) {
 	}
 }
 
+/* 
+Called when user closes experiment window. 
+Brings back experiment window and gives alert.
+*/
 function confirmClose(closedWindowId) {
 	if (closedWindowId==windowId) {
 		uninstall();
 	}
 }
 
+/* 
+blurg - what does this do?
+*/
 function saveListTabId() {
 	chrome.tabs.query({url:"*://www.aliexpress.com/*", currentWindow: true}, function(tabs) {
 		listTabId = tabs[0].id;

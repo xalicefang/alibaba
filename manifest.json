@@ -5,12 +5,12 @@
   "description": "在阿里巴巴，我们一直在寻找各种方法来改善用户体验。与斯坦福大学研究人员合作，我们目前正在调查国内和全球站客户浏览体验。需要您的帮助！如果您目前是淘宝用户，我们邀请您参加在很短10分钟的网上研究。请安装这浏览器扩展程序，开始研究。",
   "background": {
     "persistent": true,
-    "scripts": ["3party/jquery-1.11.1.js","log/pageCountTime.js","bgMsgReceiver.js","exp/intro.js","log/browserTabs.js","log/loadingTime.js","exp/expBg.js","exp/colorBg.js"]
+    "scripts": ["3party/jquery-1.11.1.js","log/pageCountTime.js","bgMsgReceiver.js","exp/intro.js","log/browserTabs.js","log/loadingTime.js","expBackbone.js","exp/colorBg.js"]
   },
   "content_scripts": [
     {
       "matches": ["http://www.aliexpress.com/*","*://stanford.edu/~fangx/cgi-bin/alibaba/*"], 
-      "js":["3party/jquery-1.11.1.js","contentScript.js","exp/expCS.js"],
+      "js":["3party/jquery-1.11.1.js","csTabsSetup.js","contentScript.js","exp/expCS.js","csMailman.js"],
       "css": ["exp/expStyle.css"],
       "run_at": "document_start"
     }

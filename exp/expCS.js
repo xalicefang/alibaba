@@ -1,9 +1,17 @@
+/****** MANIPULATES EXPERIMENT PAGES ******/
+
+/* 
+If detect already finished experiment, show alert and automatically uninstall extension
+*/
 if (document.URL.indexOf("finished.html") == -1 && window.localStorage.getItem('finished')) {
 	//alert("You have already completed this experiment!");
 	alert("你已经完成了这个实验！");
 	chrome.runtime.sendMessage({sendToUninstall:true});
 }
 
+/* 
+Set timer for experiment
+*/
 if (!window.localStorage.getItem('started')) {
 	if (document.URL.indexOf("aliexpress.com/category") != -1 || document.URL.indexOf("aliexpress.com/w") != -1) {
 		var expStartTime = Date.now();
@@ -17,20 +25,24 @@ if (!window.localStorage.getItem('started')) {
 	}
 }
 
+/* 
+Function called when task submitted. 
+*/
 function submitTask() {
-	// call save csv files, open new window for new task
+	// tells background page that task is finished
 	chrome.runtime.sendMessage({finishedTask: true}, function(response) {
 	    if (response.finished) {
 	    	window.localStorage.setItem('finished', true);
 	    }
 	});
-
-	var currTime = new Date().getTime() / 1000;
 }
 
+/* 
+Clean the experimental shopping pages
+*/
 document.addEventListener("DOMContentLoaded", function(event) {
-	// disable right click context menu !!!!asdf removed for testing
-	// document.body.setAttribute("oncontextmenu","return false");
+	// disable right click context menu
+	document.body.setAttribute("oncontextmenu","return false");
 
 	if (document.URL.indexOf("aliexpress.com/") != -1 ) {
 		// progress timer
